@@ -3,28 +3,28 @@ variable "region" {
   type        = string
   default     = "us-east-1"
 }
-# variable "access_key" {
-#   description = "The IAM access_key."
-#   type        = string
-#   sensitive   = true
-# }
-# variable "secret_key" {
-#   description = "The IAM secret_key."
-#   type        = string
-#   sensitive   = true
-# }
+variable "access_key" {
+  description = "The IAM access_key."
+  type        = string
+  sensitive   = true
+}
+variable "secret_key" {
+  description = "The IAM secret_key."
+  type        = string
+  sensitive   = true
+}
 variable "vpc_cidr" {
   description = "CIDR for the VPC."
   default     = "10.20.30.0/24"
 }
 variable "subnet_cidr_private" {
   description = "CIDR blocks for the private subnets."
-  default     = ["10.20.30.0/27", "10.20.30.32/27", "10.20.30.64/27"]
+  default     = ["10.20.30.0/27", "10.20.30.32/27"]
   type        = list(any)
 }
 variable "subnet_cidr_public" {
   description = "CIDR blocks for the public subnets."
-  default     = ["10.20.30.96/27"]
+  default     = ["10.20.30.64/27", "10.20.30.96/27"]
   type        = list(any)
 }
 variable "enable_dns_hostnames" {
