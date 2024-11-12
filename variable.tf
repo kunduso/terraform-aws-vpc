@@ -43,3 +43,7 @@ variable "enable_internet_gateway" {
   description = "Enable internet gateway for VPC."
   default     = false
 }
+variable "enable_nat_gateway" {
+  description = "Enable nat gateway for VPC."
+  default     = false
+}

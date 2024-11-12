@@ -7,7 +7,7 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames = var.enable_dns_hostnames == null ? false : var.enable_dns_hostnames
   #checkov:skip=CKV2_AWS_11: Not creating a flow log for this VPC
   tags = {
-    "Name" = var.vpc_name == "" ? "vpc-${random_string.vpc_name[0].result}" : var.vpc_name
+    "Name" = var.vpc_name
   }
 }
 data "aws_availability_zones" "available" {
@@ -67,23 +67,26 @@ resource "aws_route" "internet-route" {
   route_table_id         = aws_route_table.public.id
   gateway_id             = aws_internet_gateway.this-igw[0].id
 }
-# # resource "aws_eip" "nat_gateway" {
-# #   count  = length(var.subnet_cidr_public)
-# #   domain = "vpc"
-# #   #checkov:skip=CKV2_AWS_19: The IP is attached to the NAT gateway
-# # }
-# # resource "aws_nat_gateway" "public" {
-# #   count         = length(var.subnet_cidr_public)
-# #   subnet_id     = element(aws_subnet.public.*.id, count.index)
-# #   allocation_id = aws_eip.nat_gateway[count.index].id
-# #   depends_on    = [aws_internet_gateway.this-igw]
-# #   tags = {
-# #     "Name" = "app-2-NAT-${count.index + 1}"
-# #   }
-# # }
-# # resource "aws_route" "private-route" {
-# #   count                  = length(var.subnet_cidr_private)
-# #   destination_cidr_block = "0.0.0.0/0"
-# #   route_table_id         = aws_route_table.private[count.index].id
-# #   nat_gateway_id         = aws_nat_gateway.public[count.index].id
-# # }
+resource "aws_eip" "nat_gateway" {
+  count  = var.enable_nat_gateway ? length(var.subnet_cidr_public) : 0
+  domain = "vpc"
+  #checkov:skip=CKV2_AWS_19: The IP is attached to the NAT gateway
+  tags = {
+    "Name" = "${var.vpc_name}-nat-eip-${count.index + 1}"
+  }
+}
+resource "aws_nat_gateway" "public" {
+  count         = var.enable_nat_gateway ? length(var.subnet_cidr_public) : 0
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  allocation_id = aws_eip.nat_gateway[count.index].id
+  depends_on    = [aws_internet_gateway.this-igw]
+  tags = {
+    "Name" = "${var.vpc_name}-nat-${count.index + 1}"
+  }
+}
+resource "aws_route" "private-route" {
+  count                  = var.enable_nat_gateway ? length(var.subnet_cidr_private) : 0
+  destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = aws_route_table.private[count.index].id
+  nat_gateway_id         = aws_nat_gateway.public[(count.index +1) % length(var.subnet_cidr_public)].id
+}
