@@ -7,7 +7,7 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames = var.enable_dns_hostnames == null ? false : var.enable_dns_hostnames
   #checkov:skip=CKV2_AWS_11: Not creating a flow log for this VPC
   tags = {
-    "Name" = var.vpc_name
+    "Name" = local.vpc_name
   }
 }
 data "aws_availability_zones" "available" {
@@ -19,7 +19,7 @@ resource "aws_subnet" "private" {
   cidr_block        = var.subnet_cidr_private[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
   tags = {
-    "Name" = "${var.vpc_name}-private-${count.index + 1}"
+    "Name" = "${local.vpc_name}-private-${count.index + 1}"
   }
 }
 resource "aws_subnet" "public" {
@@ -28,20 +28,20 @@ resource "aws_subnet" "public" {
   cidr_block        = var.subnet_cidr_public[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
   tags = {
-    "Name" = "${var.vpc_name}-public-${count.index + 1}"
+    "Name" = "${local.vpc_name}-public-${count.index + 1}"
   }
 }
 resource "aws_route_table" "private" {
   count  = length(var.subnet_cidr_private)
   vpc_id = aws_vpc.this.id
   tags = {
-    "Name" = "${var.vpc_name}-route-table-${count.index + 1}"
+    "Name" = "${local.vpc_name}-route-table-${count.index + 1}"
   }
 }
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
   tags = {
-    "Name" = "${var.vpc_name}-public"
+    "Name" = "${local.vpc_name}-public"
   }
 }
 resource "aws_route_table_association" "private" {
@@ -58,7 +58,7 @@ resource "aws_internet_gateway" "this-igw" {
   count  = var.enable_internet_gateway ? 1 : 0
   vpc_id = aws_vpc.this.id
   tags = {
-    "Name" = "${var.vpc_name}-gateway"
+    "Name" = "${local.vpc_name}-gateway"
   }
 }
 resource "aws_route" "internet-route" {
@@ -72,7 +72,7 @@ resource "aws_eip" "nat_gateway" {
   domain = "vpc"
   #checkov:skip=CKV2_AWS_19: The IP is attached to the NAT gateway
   tags = {
-    "Name" = "${var.vpc_name}-nat-eip-${count.index + 1}"
+    "Name" = "${local.vpc_name}-nat-eip-${count.index + 1}"
   }
 }
 resource "aws_nat_gateway" "public" {
@@ -81,12 +81,12 @@ resource "aws_nat_gateway" "public" {
   allocation_id = aws_eip.nat_gateway[count.index].id
   depends_on    = [aws_internet_gateway.this-igw]
   tags = {
-    "Name" = "${var.vpc_name}-nat-${count.index + 1}"
+    "Name" = "${local.vpc_name}-nat-${count.index + 1}"
   }
 }
 resource "aws_route" "private-route" {
   count                  = var.enable_nat_gateway ? length(var.subnet_cidr_private) : 0
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.private[count.index].id
-  nat_gateway_id         = aws_nat_gateway.public[(count.index +1) % length(var.subnet_cidr_public)].id
+  nat_gateway_id         = aws_nat_gateway.public[(count.index + 1) % length(var.subnet_cidr_public)].id
 }
