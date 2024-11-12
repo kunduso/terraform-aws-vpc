@@ -10,40 +10,40 @@ resource "aws_vpc" "this" {
     "Name" = var.vpc_name == "" ? "vpc-${random_string.vpc_name[0].result}" : var.vpc_name
   }
 }
-#  data "aws_availability_zones" "available" {
-#   state = "available"
-# }
-# resource "aws_subnet" "private" {
-#   count             = length(var.subnet_cidr_private)
-#   vpc_id            = aws_vpc.this.id
-#   cidr_block        = var.subnet_cidr_private[count.index]
-#   availability_zone = data.aws_availability_zones.available.names[count.index]
-#   tags = {
-#     "Name" = "app-2-private-${count.index + 1}"
-#   }
-# }
-# resource "aws_subnet" "public" {
-#   count             = length(var.subnet_cidr_public)
-#   vpc_id            = aws_vpc.this.id
-#   cidr_block        = var.subnet_cidr_public[count.index]
-#   availability_zone = data.aws_availability_zones.available.names[count.index]
-#   tags = {
-#     "Name" = "app-2-public-${count.index + 1}"
-#   }
-# }
-# resource "aws_route_table" "private" {
-#   count  = length(var.subnet_cidr_private)
-#   vpc_id = aws_vpc.this.id
-#   tags = {
-#     "Name" = "app-2-route-table-${count.index + 1}"
-#   }
-# }
-# resource "aws_route_table" "public" {
-#   vpc_id = aws_vpc.this.id
-#   tags = {
-#     "Name" = "app-2-public"
-#   }
-# }
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+resource "aws_subnet" "private" {
+  count             = length(var.subnet_cidr_private)
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.subnet_cidr_private[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags = {
+    "Name" = "${var.vpc_name}-private-${count.index + 1}"
+  }
+}
+resource "aws_subnet" "public" {
+  count             = length(var.subnet_cidr_public)
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.subnet_cidr_public[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags = {
+    "Name" = "${var.vpc_name}-public-${count.index + 1}"
+  }
+}
+resource "aws_route_table" "private" {
+  count  = length(var.subnet_cidr_private)
+  vpc_id = aws_vpc.this.id
+  tags = {
+    "Name" = "${var.vpc_name}-route-table-${count.index + 1}"
+  }
+}
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.this.id
+  tags = {
+    "Name" = "${var.vpc_name}-public"
+  }
+}
 # resource "aws_route_table_association" "private" {
 #   count          = length(var.subnet_cidr_private)
 #   subnet_id      = element(aws_subnet.private.*.id, count.index)
