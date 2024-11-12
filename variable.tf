@@ -39,3 +39,7 @@ variable "vpc_name" {
   description = "Name of the VPC."
   default     = ""
 }
+variable "enable_internet_gateway" {
+  description = "Enable internet gateway for VPC."
+  default     = false
+}

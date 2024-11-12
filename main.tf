@@ -44,27 +44,29 @@ resource "aws_route_table" "public" {
     "Name" = "${var.vpc_name}-public"
   }
 }
-# resource "aws_route_table_association" "private" {
-#   count          = length(var.subnet_cidr_private)
-#   subnet_id      = element(aws_subnet.private.*.id, count.index)
-#   route_table_id = aws_route_table.private[count.index].id
-# }
-# resource "aws_route_table_association" "public" {
-#   count          = length(var.subnet_cidr_public)
-#   subnet_id      = element(aws_subnet.public.*.id, count.index)
-#   route_table_id = aws_route_table.public.id
-# }
-# # resource "aws_internet_gateway" "this-igw" {
-# #   vpc_id = aws_vpc.this.id
-# #   tags = {
-# #     "Name" = "app-2-gateway"
-# #   }
-# # }
-# # resource "aws_route" "internet-route" {
-# #   destination_cidr_block = "0.0.0.0/0"
-# #   route_table_id         = aws_route_table.public.id
-# #   gateway_id             = aws_internet_gateway.this-igw.id
-# # }
+resource "aws_route_table_association" "private" {
+  count          = length(var.subnet_cidr_private)
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = aws_route_table.private[count.index].id
+}
+resource "aws_route_table_association" "public" {
+  count          = length(var.subnet_cidr_public)
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  route_table_id = aws_route_table.public.id
+}
+resource "aws_internet_gateway" "this-igw" {
+  count  = var.enable_internet_gateway ? 1 : 0
+  vpc_id = aws_vpc.this.id
+  tags = {
+    "Name" = "${var.vpc_name}-gateway"
+  }
+}
+resource "aws_route" "internet-route" {
+  count                  = var.enable_internet_gateway ? 1 : 0
+  destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = aws_route_table.public.id
+  gateway_id             = aws_internet_gateway.this-igw[0].id
+}
 # # resource "aws_eip" "nat_gateway" {
 # #   count  = length(var.subnet_cidr_public)
 # #   domain = "vpc"
