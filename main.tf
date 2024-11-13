@@ -57,18 +57,18 @@ resource "aws_route_table_association" "public" {
   subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = aws_route_table.public.id
 }
-resource "aws_internet_gateway" "this-igw" {
+resource "aws_internet_gateway" "this_igw" {
   count  = var.enable_internet_gateway ? 1 : 0
   vpc_id = aws_vpc.this.id
   tags = {
     "Name" = "${local.vpc_name}-gateway"
   }
 }
-resource "aws_route" "internet-route" {
+resource "aws_route" "internet_route" {
   count                  = var.enable_internet_gateway ? 1 : 0
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.public.id
-  gateway_id             = aws_internet_gateway.this-igw[0].id
+  gateway_id             = aws_internet_gateway.this_igw[0].id
 }
 resource "aws_eip" "nat_gateway" {
   count  = (var.enable_nat_gateway && var.enable_internet_gateway) ? length(var.subnet_cidr_public) : 0
@@ -82,12 +82,12 @@ resource "aws_nat_gateway" "public" {
   count         = (var.enable_nat_gateway && var.enable_internet_gateway) ? length(var.subnet_cidr_public) : 0
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   allocation_id = aws_eip.nat_gateway[count.index].id
-  depends_on    = [aws_internet_gateway.this-igw]
+  depends_on    = [aws_internet_gateway.this_igw]
   tags = {
     "Name" = "${local.vpc_name}-nat-${count.index + 1}"
   }
 }
-resource "aws_route" "private-route" {
+resource "aws_route" "private_route" {
   count                  = (var.enable_nat_gateway && var.enable_internet_gateway) ? length(var.subnet_cidr_private) : 0
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.private[count.index].id
