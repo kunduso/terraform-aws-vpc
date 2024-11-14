@@ -12,7 +12,7 @@ variables:
   terraformVersion: '1.5.0'  # Specify the Terraform version
   awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
   workingDirectory: 'example'  # Set working directory to 'example'
-  group: ado-tf-aws-vpc
+  group: aws-credentials
 
 jobs:
 - job: Terraform
@@ -31,14 +31,25 @@ jobs:
       displayName: 'Install Terraform'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
       
-    # Step 2: Terraform initialization and validation
+    # Step 2: Terraform initialization
     - script: |
-        terraform init
+        terraform init \
+          -backend-config="bucket=kunduso-terraform-remote-bucket" \
+          -backend-config="key=tf/terraform-aws-vpc/terraform.tfstate" \
+          -backend-config="region=$(region)" \
+          -backend-config="access_key=$(access_key)" \
+          -backend-config="secret_key=$(secret_key)" \
+          -no-color
+      displayName: 'Terraform Init and Validate'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    # Step 3: Terraform validation
+    - script: |
         terraform validate
       displayName: 'Terraform Init and Validate'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 3: Terraform Plan (Run on non-main branches or PRs to main)
+    # Step 4: Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
         terraform plan -out=tfplan
       displayName: 'Terraform Plan'
@@ -49,9 +60,9 @@ jobs:
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 4: Terraform Apply (Run only on main branch)
+    # Step 5: Terraform Apply (Run only on main branch)
     - script: |
-        terraform apply -auto-approve tfplan
+        echo "terraform apply -auto-approve tfplan"
       displayName: 'Terraform Apply'
       condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
