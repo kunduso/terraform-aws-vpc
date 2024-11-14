@@ -43,13 +43,13 @@ jobs:
           -backend-config="access_key=$(access_key)" \
           -backend-config="secret_key=$(secret_key)" \
           -no-color
-      displayName: 'Terraform Init and Validate'
+      displayName: 'Terraform Init'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
     # Step 3: Terraform validation
     - script: |
         terraform validate
-      displayName: 'Terraform Init and Validate'
+      displayName: 'Terraform Validate'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
     # Step 4: Terraform Plan (Run on non-main branches or PRs to main)
@@ -57,9 +57,9 @@ jobs:
         terraform plan -out=tfplan
       displayName: 'Terraform Plan'
       condition: |
-        and(
-          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),
-          contains(variables['Build.SourceBranchName'], 'refs/pull')
+        or(
+          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),  # Not main branch
+          contains(variables['Build.SourceBranchName'], 'refs/pull')  # Pull request
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
