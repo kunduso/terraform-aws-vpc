@@ -52,7 +52,7 @@ jobs:
 
     # Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
-        terraform plan -var region=$(region) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color
+        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color
       displayName: 'Terraform Plan'
       condition: |
         or(
@@ -63,7 +63,7 @@ jobs:
 
     # Terraform Apply (Run only on main branch)
     - script: |
-        terraform apply -var region=$(region) -var access_key=$(access_key) -var secret_key=$(secret_key) -auto-approve -no-color
+        terraform apply -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -auto-approve -no-color
       displayName: 'Terraform Apply'
       condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
