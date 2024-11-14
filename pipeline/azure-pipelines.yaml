@@ -1,40 +1,50 @@
 trigger:
-- main
+  branches:
+    include:
+      - '*'  # Trigger pipeline on all branches
 
-pool:
-  vmImage: 'vs2017-win2016'
+pr:
+  branches:
+    include:
+      - main  # Trigger pipeline on PRs to the 'main' branch
 
 variables:
-  - group: ADO-TF-AWS-VPC-Int
-  - name: region
-    value: 'us-east-1'
+  terraformVersion: '1.5.0'  # Specify the Terraform version
+  awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
+  workingDirectory: 'example'  # Set working directory to 'example'
+  group: ado-tf-aws-vpc
 
+jobs:
+- job: Terraform
+  displayName: 'Terraform Provisioning'
+  pool:
+    vmImage: 'ubuntu-latest'  # Use an Ubuntu agent
+    workingDirectory: $(Build.SourcesDirectory)\$(workingDirectory)  # Set working directory for all steps in the job
+  steps:
+    # Install Terraform
+    - task: UseTerraform@0
+      inputs:
+        version: $(terraformVersion)
 
-# Install Terraform extension to use this task https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks&ssr=false#overview
-steps:
-- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-  displayName: 'Install Terraform 0.14.0'
-  inputs:
-    terraformVersion: 0.14.0
-# Terraform versions: https://releases.hashicorp.com/terraform/
+    # Step 1: Terraform initialization and validation
+    - script: |
+        terraform init
+        terraform validate
+      displayName: 'Terraform Init and Validate'
 
-- powershell: |
-   Write-Host "This is the current working directory: $(build.sourcesdirectory)"
-   terraform init -backend-config="bucket=skundu-terraform-remote-state" -backend-config="key=tf/ADO-TF-VPC-Int/terraform.tfstate" -backend-config="region=$(region)" -backend-config="access_key=$(access_key)" -backend-config="secret_key=$(secret_key)" -no-color
-  workingDirectory: $(build.sourcesdirectory)
-  displayName: 'terraform init'
+    # Step 2: Terraform Plan (Run on non-main branches or PRs to main)
+    - script: |
+        terraform plan -out=tfplan
+      displayName: 'Terraform Plan'
+      condition: |
+        and(
+          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),  # Trigger if not on main
+          or(contains(variables['Build.SourceBranchName'], 'refs/pull'),  # Trigger for PRs to main
+          eq(variables['Build.SourceBranchName'], 'refs/heads/main'))
+        )
 
-- powershell: |
-   terraform validate -json -no-color
-  workingDirectory: $(build.sourcesdirectory)
-  displayName: 'terraform validate'
-
-- powershell: |
-   terraform plan -var region=$(region) -var access_key=$(access_key) -var secret_key=$(secret_key) -out application.tfplan -no-color
-  workingDirectory: $(build.sourcesdirectory)
-  displayName: 'terraform plan'
-
-- powershell: |
-   terraform apply "application.tfplan" -no-color
-  workingDirectory: $(build.sourcesdirectory)
-  displayName: 'terraform apply'
+    # Step 3: Terraform Apply (Run only on main branch)
+    - script: |
+        terraform apply -auto-approve tfplan
+      displayName: 'Terraform Apply'
+      condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
