@@ -1,4 +1,4 @@
-[![Build Status](https://littlecoding.visualstudio.com/Open-Project/_apis/build/status/kunduso.AzureDevOps-Terraform-AWS-VPC-Integration?branchName=main)](https://littlecoding.visualstudio.com/Open-Project/_build/latest?definitionId=18&branchName=main)
+[![Build Status](https://littlecoding.visualstudio.com/Open-Project/_apis/build/status%2Fkunduso.terraform-aws-vpc?branchName=main)](https://littlecoding.visualstudio.com/Open-Project/_build/latest?definitionId=37&branchName=main)
 # Terraform Module for Amazon Virtual Private Cloud resources
 This repository contains a Terraform module that automates the creation of Amazon Virtual Private Cloud (VPC) resources on AWS. The module provisions essential VPC components, including:
 <br /> **- VPC:** The Virtual Private Cloud itself.
