@@ -23,7 +23,7 @@ jobs:
     vmImage: 'ubuntu-latest'  # Use an Ubuntu agent
 
   steps:
-    # Step 1: Install Terraform using a script
+    # Install Terraform using a script
     - script: |
         curl -sLo terraform.zip https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip
         unzip terraform.zip
@@ -31,14 +31,8 @@ jobs:
         terraform --version
       displayName: 'Install Terraform'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-    # Step 2: Set AWS credentials as environment variables
-    - script: |
-        echo "Setting AWS credentials from secure variables"
-        export AWS_DEFAULT_REGION=$(awsRegion)  # Set the AWS region
-        export AWS_ACCESS_KEY_ID=$(access_key)  # Reference secure variable `variable_one` (Access Key)
-        export AWS_SECRET_ACCESS_KEY=$(secret_key)  # Reference secure variable `variable_two` (Secret Key)
-        
-    # Step 3: Terraform initialization
+
+    # Terraform initialization
     - script: |
         terraform init \
           -backend-config="bucket=kunduso-terraform-remote-bucket" \
@@ -50,15 +44,15 @@ jobs:
       displayName: 'Terraform Init'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 4: Terraform validation
+    # Terraform validation
     - script: |
         terraform validate
       displayName: 'Terraform Validate'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 5: Terraform Plan (Run on non-main branches or PRs to main)
+    # Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
-        terraform plan -out=tfplan
+        terraform plan -var region=$(region) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color
       displayName: 'Terraform Plan'
       condition: |
         or(
@@ -67,9 +61,9 @@ jobs:
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 6: Terraform Apply (Run only on main branch)
+    # Terraform Apply (Run only on main branch)
     - script: |
-        echo "terraform apply -auto-approve tfplan"
+        terraform apply -var region=$(region) -var access_key=$(access_key) -var secret_key=$(secret_key) -auto-approve -no-color
       displayName: 'Terraform Apply'
       condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
