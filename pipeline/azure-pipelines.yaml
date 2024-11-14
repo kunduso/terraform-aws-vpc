@@ -58,8 +58,8 @@ jobs:
       displayName: 'Terraform Plan'
       condition: |
         or(
-          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),  # Not main branch
-          contains(variables['Build.SourceBranchName'], 'refs/pull')  # Pull request
+          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),
+          contains(variables['Build.SourceBranchName'], 'refs/pull')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
