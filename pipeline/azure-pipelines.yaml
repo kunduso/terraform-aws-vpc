@@ -40,8 +40,8 @@ jobs:
           -backend-config="bucket=kunduso-terraform-remote-bucket" \
           -backend-config="key=tf/terraform-aws-vpc/terraform.tfstate" \
           -backend-config="region=$(awsRegion)" \
-          -backend-config="access_key=$(awscredentials.access_key)" \
-          -backend-config="secret_key=$(awscredentials.secret_key)" \
+          -backend-config="access_key=$(access_key)" \
+          -backend-config="secret_key=$(secret_key)" \
           -no-color
       displayName: 'Terraform Init and Validate'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
