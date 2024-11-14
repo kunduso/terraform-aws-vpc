@@ -44,9 +44,8 @@ jobs:
       displayName: 'Terraform Plan'
       condition: |
         and(
-          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),  # Trigger if not on main
-          or(contains(variables['Build.SourceBranchName'], 'refs/pull'),  # Trigger for PRs to main
-          eq(variables['Build.SourceBranchName'], 'refs/heads/main'))
+          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),
+          contains(variables['Build.SourceBranchName'], 'refs/pull')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
