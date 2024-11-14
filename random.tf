@@ -4,4 +4,5 @@ resource "random_string" "vpc_name" {
   count   = var.vpc_name == "" ? 1 : 0
   length  = 5
   special = false
+  upper   = false
 }
