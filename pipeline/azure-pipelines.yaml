@@ -11,8 +11,6 @@ pr:
 variables:
 - group: awscredentials
 
-
-
 jobs:
 - job: Terraform
   variables:
@@ -33,8 +31,14 @@ jobs:
         terraform --version
       displayName: 'Install Terraform'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-      
-    # Step 2: Terraform initialization
+    # Step 2: Set AWS credentials as environment variables
+    - script: |
+        echo "Setting AWS credentials from secure variables"
+        export AWS_DEFAULT_REGION=$(awsRegion)  # Set the AWS region
+        export AWS_ACCESS_KEY_ID=$(access_key)  # Reference secure variable `variable_one` (Access Key)
+        export AWS_SECRET_ACCESS_KEY=$(secret_key)  # Reference secure variable `variable_two` (Secret Key)
+        
+    # Step 3: Terraform initialization
     - script: |
         terraform init \
           -backend-config="bucket=kunduso-terraform-remote-bucket" \
@@ -46,13 +50,13 @@ jobs:
       displayName: 'Terraform Init'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 3: Terraform validation
+    # Step 4: Terraform validation
     - script: |
         terraform validate
       displayName: 'Terraform Validate'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 4: Terraform Plan (Run on non-main branches or PRs to main)
+    # Step 5: Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
         terraform plan -out=tfplan
       displayName: 'Terraform Plan'
@@ -63,7 +67,7 @@ jobs:
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 5: Terraform Apply (Run only on main branch)
+    # Step 6: Terraform Apply (Run only on main branch)
     - script: |
         echo "terraform apply -auto-approve tfplan"
       displayName: 'Terraform Apply'
