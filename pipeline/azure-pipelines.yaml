@@ -16,23 +16,29 @@ variables:
 
 jobs:
 - job: Terraform
+
   displayName: 'Terraform Provisioning'
   pool:
     vmImage: 'ubuntu-latest'  # Use an Ubuntu agent
-    workingDirectory: $(Build.SourcesDirectory)\$(workingDirectory)  # Set working directory for all steps in the job
-  steps:
-    # Install Terraform
-    - task: UseTerraform@0
-      inputs:
-        version: $(terraformVersion)
 
-    # Step 1: Terraform initialization and validation
+  steps:
+    # Step 1: Install Terraform using a script
+    - script: |
+        curl -sLo terraform.zip https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        terraform --version
+      displayName: 'Install Terraform'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+      
+    # Step 2: Terraform initialization and validation
     - script: |
         terraform init
         terraform validate
       displayName: 'Terraform Init and Validate'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 2: Terraform Plan (Run on non-main branches or PRs to main)
+    # Step 3: Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
         terraform plan -out=tfplan
       displayName: 'Terraform Plan'
@@ -42,9 +48,11 @@ jobs:
           or(contains(variables['Build.SourceBranchName'], 'refs/pull'),  # Trigger for PRs to main
           eq(variables['Build.SourceBranchName'], 'refs/heads/main'))
         )
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Step 3: Terraform Apply (Run only on main branch)
+    # Step 4: Terraform Apply (Run only on main branch)
     - script: |
         terraform apply -auto-approve tfplan
       displayName: 'Terraform Apply'
       condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
