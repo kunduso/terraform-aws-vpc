@@ -73,7 +73,7 @@ jobs:
           # Create the comment body with proper JSON escaping
           # Format the plan output as plain text
           PLAN_OUTPUT=$(terraform show -no-color tfplan.json)
-          BODY=$(jq -n --arg plan "$PLAN_OUTPUT" '{"body": "### Terraform Plan Output\n```\n" + $plan + "\n```"}')
+          BODY=$(jq -n --arg plan "$PLAN_OUTPUT" '{body: "### Terraform Plan Output\n```\n\($plan)\n```"}')
           # Post the comment directly
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
