@@ -11,9 +11,10 @@ resource "aws_flow_log" "network_flow_logging" {
 }
 
 resource "aws_cloudwatch_log_group" "network_flow_logging" {
-  count      = var.enable_flow_log ? 1 : 0
-  name       = local.flow_log
-  kms_key_id = aws_kms_key.custom_kms_key[0].arn
+  count             = var.enable_flow_log ? 1 : 0
+  name              = local.flow_log
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.custom_kms_key[0].arn
 }
 
 data "aws_iam_policy_document" "assume_role" {
