@@ -77,9 +77,10 @@ jobs:
       condition: |
         and(
           succeeded(),
-          contains(variables['System.PullRequest.SourceBranch'], 'refs/pull/')
+          ne(variables['System.PullRequest.SourceBranch'], '')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+      displayName: 'Post GitHub pull request comment'
 
     # Terraform Apply (Run only on main branch)
     - script: |
