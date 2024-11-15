@@ -77,7 +77,7 @@ jobs:
       condition: |
         and(
           succeeded(),
-          ne(variables['System.PullRequest.SourceBranch'], '')  # Ensure it is a PR build
+          ne(variables['System.PullRequest.SourceBranch'], '')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
   
