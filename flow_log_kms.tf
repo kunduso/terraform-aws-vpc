@@ -12,7 +12,6 @@ resource "aws_kms_key" "custom_kms_key" {
   deletion_window_in_days = 7
   enable_key_rotation     = true
   policy                  = aws_kms_key_policy.encrypt_log.id
-  #checkov:skip=CKV2_AWS_64: "Ensure KMS key Policy is defined"
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
 resource "aws_kms_alias" "key" {
