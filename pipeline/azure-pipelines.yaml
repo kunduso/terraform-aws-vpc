@@ -11,12 +11,16 @@ pr:
 variables:
 - group: awscredentials
 
+
 jobs:
 - job: Terraform
   variables:
     terraformVersion: '1.5.0'  # Specify the Terraform version
     awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
     workingDirectory: 'example'  # Set working directory to 'example'
+    githubToken: $(GH_TOKEN)  # GitHub token from pipeline secret variable
+    githubOwner: 'kunduso'  # GitHub user/organization
+    githubRepo: 'terraform-aws-vpc'  # GitHub repository name
 
   displayName: 'Terraform Provisioning'
   pool:
@@ -52,7 +56,7 @@ jobs:
 
     # Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
-        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color
+        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color -out=tfplan > plan_output.txt
       displayName: 'Terraform Plan'
       condition: |
         or(
@@ -60,6 +64,17 @@ jobs:
           contains(variables['Build.SourceBranchName'], 'refs/pull')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    - script: |
+        # Check if the build was triggered by a PR
+        if [[ $(System.PullRequest.SourceBranch) ]]; then
+          PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestId)/comments"
+          
+          # Post the plan output as a comment on the PR
+          curl -X POST -H "Authorization: token $(githubToken)" -d "{\"body\": \"Terraform Plan Output:\\n$(cat plan_output.txt)\"}" $PR_URL
+        fi
+        displayName: 'Post Plan Output to GitHub PR'
+      condition: succeeded()  # Only run if the previous steps succeeded
 
     # Terraform Apply (Run only on main branch)
     - script: |
