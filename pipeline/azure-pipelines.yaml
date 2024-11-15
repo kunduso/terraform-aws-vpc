@@ -80,7 +80,6 @@ jobs:
           ne(variables['System.PullRequest.SourceBranch'], '')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-  
 
     # Terraform Apply (Run only on main branch)
     - script: |
