@@ -57,7 +57,7 @@ jobs:
 
     # Terraform Plan (Run on non-main branches or PRs to main)
     - script: |
-        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color -out=tfplan > plan_output.json
+        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color -out=tfplan.json
       displayName: 'Terraform Plan'
       condition: |
         or(
@@ -70,14 +70,11 @@ jobs:
         # Check if the build was triggered by a PR
         if [[ $(System.PullRequest.SourceBranch) ]]; then
           PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
-          COMMENT=$(cat plan_output.json)
-          COMMENT_ESCAPED=$(echo "$COMMENT" | jq -R .)
-          JSON_PAYLOAD=$(COMMENT_ESCAPED)
-          echo "Posting comment to PR with payload: $JSON_PAYLOAD"
+          COMMENT=$(cat tfplan.json)
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
             -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD" \
+            -d "$COMMENT" \
             "$PR_URL"
         fi
       displayName: 'Post Plan Output to GitHub PR'
