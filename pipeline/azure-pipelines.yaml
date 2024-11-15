@@ -72,7 +72,7 @@ jobs:
           PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
           COMMENT=$(cat plan_output.json)
           COMMENT_ESCAPED=$(echo "$COMMENT" | jq -R .)
-          JSON_PAYLOAD=$(printf '{"body": "Terraform Plan Output:\\n```json\\n%s\\n```"}' "$COMMENT_ESCAPED")
+          JSON_PAYLOAD=$(COMMENT_ESCAPED)
           echo "Posting comment to PR with payload: $JSON_PAYLOAD"
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
