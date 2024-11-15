@@ -121,4 +121,4 @@ Note: Ensure you have appropriate AWS credentials configured before running the 
 ## Contributing
 If you find any issues or have suggestions for improvement, feel free to open an issue or submit a pull request. Contributions are always welcome!
 ## License
-This code is released under the Unlincse License. See [LICENSE](LICENSE).
+This code is released under the Unlicense License. See [LICENSE](LICENSE).
