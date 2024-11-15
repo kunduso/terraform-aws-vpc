@@ -1,0 +1,97 @@
+trigger:
+  branches:
+    include:
+      - 'main'
+      # - '*'  # Trigger pipeline on all branches
+
+pr:
+  branches:
+    include:
+      - main  # Trigger pipeline on PRs to the 'main' branch
+
+variables:
+- group: awscredentials
+- group: GH_TOKEN
+
+jobs:
+- job: Terraform
+  variables:
+    terraformVersion: '1.5.0'  # Specify the Terraform version
+    awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
+    workingDirectory: 'example'  # Set working directory to 'example'
+    githubToken: $(GH_TOKEN)  # GitHub token from pipeline secret variable
+    githubOwner: 'kunduso'  # GitHub user/organization
+    githubRepo: 'terraform-aws-vpc'  # GitHub repository name
+
+  displayName: 'Terraform Provisioning'
+  pool:
+    vmImage: 'ubuntu-latest'  # Use an Ubuntu agent
+
+  steps:
+    # Install Terraform using a script
+    - script: |
+        curl -sLo terraform.zip https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        terraform --version
+      displayName: 'Install Terraform'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    # Terraform initialization
+    - script: |
+        terraform init \
+          -backend-config="bucket=kunduso-terraform-remote-bucket" \
+          -backend-config="key=tf/terraform-aws-vpc/terraform.tfstate" \
+          -backend-config="region=$(awsRegion)" \
+          -backend-config="access_key=$(access_key)" \
+          -backend-config="secret_key=$(secret_key)" \
+          -no-color
+      displayName: 'Terraform Init'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    # Terraform validation
+    - script: |
+        terraform validate
+      displayName: 'Terraform Validate'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    # Terraform Plan (Run on non-main branches or PRs to main)
+    - script: |
+        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color -out=tfplan.json
+      displayName: 'Terraform Plan'
+      condition: |
+        or(
+          ne(variables['Build.SourceBranchName'], 'refs/heads/main'),
+          contains(variables['System.PullRequest.SourceBranch'], 'refs/pull/')
+        )
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    - script: |
+        # Check if the build was triggered by a PR
+        if [[ $(System.PullRequest.SourceBranch) ]]; then
+          PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
+          # Create the comment body with proper JSON escaping
+          # Format the plan output as plain text
+          PLAN_OUTPUT=$(terraform show -no-color tfplan.json)
+          BODY=$(jq -n --arg plan "$PLAN_OUTPUT" '{body: "### Terraform Plan Output\n```\n\($plan)\n```"}')
+          # Post the comment directly
+          curl -X POST \
+            -H "Authorization: token $(GH_TOKEN)" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" \
+            "$PR_URL"
+        fi
+      displayName: 'Post Plan Output to GitHub PR'
+      condition: |
+        and(
+          succeeded(),
+          ne(variables['System.PullRequest.SourceBranch'], '')
+        )
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    # Terraform Apply (Run only on main branch)
+    - script: |
+        terraform apply -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -auto-approve -no-color
+      displayName: 'Terraform Apply'
+      condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
