@@ -68,7 +68,7 @@ jobs:
     - script: |
         # Check if the build was triggered by a PR
         if [[ $(System.PullRequest.SourceBranch) ]]; then
-          PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestId)/comments"
+          PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/pulls/$(System.PullRequest.PullRequestId)/comments"
           
           # Post the plan output as a comment on the PR
           curl -X POST -H "Authorization: token $(githubToken)" -d "{\"body\": \"Terraform Plan Output:\\n$(cat plan_output.txt)\"}" $PR_URL
@@ -77,9 +77,10 @@ jobs:
       condition: |
         and(
           succeeded(),
-          ne(variables['System.PullRequest.SourceBranch'], '')
+          ne(variables['System.PullRequest.SourceBranch'], '')  # Ensure it is a PR build
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+  
 
     # Terraform Apply (Run only on main branch)
     - script: |
