@@ -61,7 +61,7 @@ jobs:
       condition: |
         or(
           ne(variables['Build.SourceBranchName'], 'refs/heads/main'),
-          contains(variables['Build.SourceBranchName'], 'refs/pull')
+          contains(variables['System.PullRequest.SourceBranch'], 'refs/pull/')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
@@ -77,7 +77,7 @@ jobs:
       condition: |
         and(
           succeeded(),
-          contains(variables['Build.SourceBranchName'], 'refs/pull')
+          contains(variables['System.PullRequest.SourceBranch'], 'refs/pull/')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
