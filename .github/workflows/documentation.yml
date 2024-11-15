@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      #checkov:skip=CKV2_GHA_1: Ensure top-level permissions are not set to write-all
+      # This is required to add Terraform module details to the ReadMe.md
       id-token: write
       pull-requests: write
     steps:
