@@ -1,8 +1,7 @@
 trigger:
   branches:
     include:
-      - 'main'
-      # - '*'  # Trigger pipeline on all branches
+      - '*'
 
 pr:
   branches:
@@ -55,9 +54,21 @@ jobs:
       displayName: 'Terraform Validate'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Terraform Plan (Run on non-main branches or PRs to main)
+    # Add Terraform Format Check
     - script: |
-        terraform plan -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -no-color -out=tfplan.json
+        terraform fmt -check -recursive
+      displayName: 'Terraform Format Check'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # Terraform Plan with better error handling
+    - script: |
+        set -e
+        terraform plan \
+          -var "region=$(awsRegion)" \
+          -var "access_key=$(access_key)" \
+          -var "secret_key=$(secret_key)" \
+          -no-color \
+          -out=tfplan.json
       displayName: 'Terraform Plan'
       condition: |
         or(
@@ -67,31 +78,42 @@ jobs:
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
     - script: |
-        # Check if the build was triggered by a PR
         if [[ $(System.PullRequest.SourceBranch) ]]; then
           PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
-          # Create the comment body with proper JSON escaping
-          # Format the plan output as plain text
+          
           PLAN_OUTPUT=$(terraform show -no-color tfplan.json)
-          BODY=$(jq -n --arg plan "$PLAN_OUTPUT" '{body: "### Terraform Plan Output\n```\n\($plan)\n```"}')
-          # Post the comment directly
-          curl -X POST \
+          
+          if ! BODY=$(jq -n --arg plan "$PLAN_OUTPUT" '{body: "### Terraform Plan Output\n```\n\($plan)\n```"}'); then
+            echo "Failed to create JSON payload"
+            exit 1
+          fi
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
             -H "Content-Type: application/json" \
             -d "$BODY" \
-            "$PR_URL"
+            "$PR_URL")
+          
+          STATUS_CODE=$(echo "$RESPONSE" | tail -n 1)
+          if [[ $STATUS_CODE != 2* ]]; then
+            echo "Failed to post comment. Status code: $STATUS_CODE"
+            echo "Response: $(echo "$RESPONSE" | head -n -1)"
+            exit 1
+          fi
         fi
       displayName: 'Post Plan Output to GitHub PR'
-      condition: |
-        and(
-          succeeded(),
-          ne(variables['System.PullRequest.SourceBranch'], '')
-        )
+      condition: and(succeeded(), ne(variables['System.PullRequest.SourceBranch'], ''))
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Terraform Apply (Run only on main branch)
+    # Terraform Apply with better error handling
     - script: |
-        terraform apply -var region=$(awsRegion) -var access_key=$(access_key) -var secret_key=$(secret_key) -auto-approve -no-color
+        set -e
+        terraform apply \
+          -var "region=$(awsRegion)" \
+          -var "access_key=$(access_key)" \
+          -var "secret_key=$(secret_key)" \
+          -auto-approve \
+          -no-color
       displayName: 'Terraform Apply'
-      condition: eq(variables['Build.SourceBranchName'], 'refs/heads/main')
+      condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
