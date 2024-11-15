@@ -1,7 +1,8 @@
 trigger:
   branches:
     include:
-      - '*'  # Trigger pipeline on all branches
+      - 'main'
+      # - '*'  # Trigger pipeline on all branches
 
 pr:
   branches:
@@ -68,7 +69,7 @@ jobs:
     - script: |
         # Check if the build was triggered by a PR
         if [[ $(System.PullRequest.SourceBranch) ]]; then
-          PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/pulls/$(System.PullRequest.PullRequestId)/comments"
+          PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
           
           # Post the plan output as a comment on the PR
           curl -X POST \
