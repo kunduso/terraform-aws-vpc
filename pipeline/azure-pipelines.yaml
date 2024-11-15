@@ -73,14 +73,13 @@ jobs:
           # Post the plan output as a comment on the PR
           curl -X POST -H "Authorization: token $(githubToken)" -d "{\"body\": \"Terraform Plan Output:\\n$(cat plan_output.txt)\"}" $PR_URL
         fi
-        displayName: 'Post Plan Output to GitHub PR'
+      displayName: 'Post Plan Output to GitHub PR'
       condition: |
         and(
           succeeded(),
           ne(variables['System.PullRequest.SourceBranch'], '')
         )
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-      displayName: 'Post GitHub pull request comment'
 
     # Terraform Apply (Run only on main branch)
     - script: |
