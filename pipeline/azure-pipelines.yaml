@@ -74,7 +74,12 @@ jobs:
           curl -X POST -H "Authorization: token $(githubToken)" -d "{\"body\": \"Terraform Plan Output:\\n$(cat plan_output.txt)\"}" $PR_URL
         fi
         displayName: 'Post Plan Output to GitHub PR'
-      condition: succeeded()  # Only run if the previous steps succeeded
+      condition: |
+        and(
+          succeeded(),
+          contains(variables['Build.SourceBranchName'], 'refs/pull')
+        )
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
     # Terraform Apply (Run only on main branch)
     - script: |
