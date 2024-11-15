@@ -71,7 +71,9 @@ jobs:
         if [[ $(System.PullRequest.SourceBranch) ]]; then
           PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
           COMMENT=$(cat plan_output.json)
-          JSON_PAYLOAD="{\"body\":\"Terraform Plan Output:\\n\`\`\`json\\n${COMMENT}\\n\`\`\`\"}"
+          COMMENT_ESCAPED=$(echo "$COMMENT" | jq -Rs .)
+          JSON_PAYLOAD="{\"body\":\"Terraform Plan Output:\\n\`\`\`json\\n${COMMENT_ESCAPED}\\n\`\`\`\"}"
+          echo "Posting comment to PR with payload: $JSON_PAYLOAD"
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
             -H "Content-Type: application/json" \
