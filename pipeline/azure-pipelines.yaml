@@ -70,12 +70,13 @@ jobs:
         # Check if the build was triggered by a PR
         if [[ $(System.PullRequest.SourceBranch) ]]; then
           PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
-          
+          # Create the comment body with proper JSON escaping
+          BODY=$(jq -n --arg plan "$(cat tfplan.json)" '{"body": "### Terraform Plan Output\n```json\n" + $plan + "\n```"}')
           # Post the comment directly
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
             -H "Content-Type: application/json" \
-            -d '{"body": "### Terraform Plan Output\n```json\n'"$(cat tfplan.json)"'\n```"}' \
+            -d "$BODY" \
             "$PR_URL"
         fi
       displayName: 'Post Plan Output to GitHub PR'
