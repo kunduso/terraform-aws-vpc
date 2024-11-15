@@ -1,7 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "skundu-terraform-remote-state"
-    key    = "tf/ADO-TF-VPC-Int/terraform.tfstate"
-    region = "us-east-1"
+    bucket  = "kunduso-terraform-remote-bucket"
+    encrypt = true
+    key     = "tf/terraform-aws-vpc/terraform.tfstate"
+    region  = "us-east-2"
   }
 }
