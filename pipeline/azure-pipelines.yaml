@@ -71,7 +71,9 @@ jobs:
         if [[ $(System.PullRequest.SourceBranch) ]]; then
           PR_URL="https://api.github.com/repos/$(githubOwner)/$(githubRepo)/issues/$(System.PullRequest.PullRequestNumber)/comments"
           # Create the comment body with proper JSON escaping
-          BODY=$(jq -n --arg plan "$(cat tfplan.json)" '{"body": "### Terraform Plan Output\n```json\n" + $plan + "\n```"}')
+          # Format the plan output as plain text
+          PLAN_OUTPUT=$(terraform show -no-color tfplan.json)
+          BODY=$(jq -n --arg plan "$PLAN_OUTPUT" '{"body": "### Terraform Plan Output\n```\n" + $plan + "\n```"}')
           # Post the comment directly
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
