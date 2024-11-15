@@ -75,7 +75,7 @@ jobs:
           curl -X POST \
             -H "Authorization: token $(GH_TOKEN)" \
             -H "Content-Type: application/json" \
-            -d '{"body": "### Terraform Plan Output\n```json\n'"$(cat plan_output.json)"'\n```"}' \
+            -d '{"body": "### Terraform Plan Output\n```json\n'"$(cat tfplan.json)"'\n```"}' \
             "$PR_URL"
         fi
       displayName: 'Post Plan Output to GitHub PR'
