@@ -1,5 +1,5 @@
 #https://github.com/terraform-docs/gh-actions
-name: Generate terraform docs
+name: generate-terraform-docs
 on:
   - pull_request
 jobs:
