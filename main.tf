@@ -8,7 +8,6 @@ resource "aws_vpc" "this" {
   enable_dns_support = var.enable_dns_support == null ? false : var.enable_dns_support
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc#enable_dns_hostnames
   enable_dns_hostnames = var.enable_dns_hostnames == null ? false : var.enable_dns_hostnames
-  #checkov:skip=CKV2_AWS_11: Not creating a flow log for this VPC
   tags = {
     "Name" = local.vpc_name
   }
