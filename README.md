@@ -2,12 +2,13 @@
 # Terraform Module for Amazon Virtual Private Cloud resources
 This repository contains a Terraform module that automates the creation of Amazon Virtual Private Cloud (VPC) resources on AWS.
 
-This module provides a complete foundation for setting up secure, isolated environments in AWS, including the ability to track and log network traffic for auditing and security purposes.
-
-The repository also includes example configurations that demonstrate how to use the module in various environments, including common VPC setups for development, staging, and production.
-
-Additionally, the repository includes [Azure Pipelines](./pipeline/azure-pipelines.yaml) to automate the deployment of this infrastructure as part of a CI/CD pipeline. This makes it easy to apply your Terraform configurations directly from the pipeline.
-</br> Details available at [Exploring Azure Pipelines, Terraform, and Powershell](https://skundunotes.com/2021/02/25/exploring-azure-pipelines-terraform-and-powershell/)
+## Overview
+This module provides a complete foundation for setting up secure, isolated environments in AWS, including:
+- Automated VPC creation with customizable CIDR blocks
+- Public and private subnet configuration
+- Network traffic logging and monitoring capabilities
+- Built-in security best practices
+- Configurable NAT gateways for private subnet access
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -116,6 +117,8 @@ A complete example implementation of this module can be found in the [example di
 - Set up backend configuration
 
 You can use this example as a reference for implementing the module in your own infrastructure code.
+</br> Additionally, the repository includes [Azure Pipelines](./pipeline/azure-pipelines.yaml) to automate the deployment of this infrastructure as part of a CI/CD pipeline. This makes it easy to apply your Terraform configurations directly from the pipeline.
+</br> Details available at [Exploring Azure Pipelines, Terraform, and Powershell](https://skundunotes.com/2021/02/25/exploring-azure-pipelines-terraform-and-powershell/)
 
 Note: Ensure you have appropriate AWS credentials configured before running the example.
 
