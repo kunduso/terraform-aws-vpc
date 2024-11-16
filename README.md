@@ -118,7 +118,6 @@ A complete example implementation of this module can be found in the [example di
 
 You can use this example as a reference for implementing the module in your own infrastructure code.
 </br> Additionally, the repository includes [Azure Pipelines](./pipeline/azure-pipelines.yaml) to automate the deployment of this infrastructure as part of a CI/CD pipeline. This makes it easy to apply your Terraform configurations directly from the pipeline.
-</br> Details available at [Exploring Azure Pipelines, Terraform, and Powershell](https://skundunotes.com/2021/02/25/exploring-azure-pipelines-terraform-and-powershell/)
 
 Note: Ensure you have appropriate AWS credentials configured before running the example.
 
