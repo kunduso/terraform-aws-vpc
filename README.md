@@ -104,7 +104,7 @@ To use this module in your Terraform configuration, include the following module
 
 ```hcl
 module "vpc" {
-  source = "github.com/kunduso/terraform-aws-vpc"
+  source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.0"
   region = var.region
 }
 ````
