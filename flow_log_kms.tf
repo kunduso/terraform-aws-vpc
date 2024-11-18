@@ -28,21 +28,8 @@ resource "aws_kms_key_policy" "encrypt_log" {
     Id = "${local.vpc_name}-flow-log-encryption"
     Statement = [
       {
-        Sid = "Enable IAM User Permissions"
-        Action = [
-          "kms:Create*",
-          "kms:Describe*",
-          "kms:Enable*",
-          "kms:List*",
-          "kms:Put*",
-          "kms:Update*",
-          "kms:Revoke*",
-          "kms:Disable*",
-          "kms:Get*",
-          "kms:Delete*",
-          "kms:ScheduleKeyDeletion",
-          "kms:CancelKeyDeletion"
-        ]
+        Sid    = "Enable IAM User Permissions"
+        Action = ["kms:*"]
         Effect = "Allow"
         Principal = {
           AWS = "${local.principal_root_arn}"
