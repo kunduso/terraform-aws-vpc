@@ -11,8 +11,6 @@ resource "aws_kms_key" "custom_kms_key" {
   description             = "KMS key for ${local.vpc_name}"
   deletion_window_in_days = 7
   enable_key_rotation     = true
-  #checkov:skip=CKV2_AWS_64: "Ensure KMS key Policy is defined"
-  #KMS Key policy is defined as aws_kms_key_policy encrypt_log {}
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
 resource "aws_kms_alias" "key" {
@@ -28,30 +26,45 @@ resource "aws_kms_key_policy" "encrypt_log" {
     Id = "${local.vpc_name}-flow-log-encryption"
     Statement = [
       {
-        Action = "kms:*"
+        Sid = "Enable IAM User Permissions"
+        Action = [
+          "kms:Create*",
+          "kms:Describe*",
+          "kms:Enable*",
+          "kms:List*",
+          "kms:Put*",
+          "kms:Update*",
+          "kms:Revoke*",
+          "kms:Disable*",
+          "kms:Get*",
+          "kms:Delete*",
+          "kms:ScheduleKeyDeletion",
+          "kms:CancelKeyDeletion"
+        ]
         Effect = "Allow"
         Principal = {
           AWS = "${local.principal_root_arn}"
         }
         Resource = "*"
-        Sid      = "Enable IAM User Permissions"
       },
       {
-        Effect : "Allow",
-        Principal : {
-          Service : "${local.principal_logs_arn}"
-        },
-        Action : [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
-        ],
-        Resource : "*",
-        Condition : {
-          ArnEquals : {
-            "kms:EncryptionContext:aws:logs:arn" : [local.flow_log_group_arn]
+        Sid    = "AllowCloudWatchLogsEncryption"
+        Effect = "Allow"
+        Principal = {
+          Service = "${local.principal_logs_arn}"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = [local.flow_log_group_arn]
           }
         }
       }
