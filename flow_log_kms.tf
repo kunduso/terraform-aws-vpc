@@ -20,7 +20,6 @@ resource "aws_kms_alias" "key" {
   name          = "alias/${local.vpc_name}"
   target_key_id = aws_kms_key.custom_kms_key[0].id
 }
-# Followed recommendations from https://repost.aws/knowledge-center/kms-prevent-access
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key_policy
 resource "aws_kms_key_policy" "encrypt_log" {
   count  = var.enable_flow_log ? 1 : 0
@@ -29,50 +28,13 @@ resource "aws_kms_key_policy" "encrypt_log" {
     Id = "${local.vpc_name}-flow-log-encryption"
     Statement = [
       {
-        Sid    = "EnableRootAccessAndPreventPermissionDelegation"
+        Sid    = "Enable IAM User Permissions"
         Action = ["kms:*"]
         Effect = "Allow"
         Principal = {
           AWS = "${local.principal_root_arn}"
         }
         Resource = "*"
-        Condition = {
-          StringEquals = {
-            "aws:PrincipalType" = "Account"
-          }
-        }
-      },
-      {
-        Sid    = "Allow access for Key Administrators"
-        Effect = "Allow"
-        Principal = {
-          AWS = [
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*",
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*"
-          ]
-        }
-        Action = [
-          "kms:Create*",
-          "kms:Describe*",
-          "kms:Enable*",
-          "kms:List*",
-          "kms:Put*",
-          "kms:Update*",
-          "kms:Revoke*",
-          "kms:Disable*",
-          "kms:Get*",
-          "kms:Delete*",
-          "kms:TagResource",
-          "kms:UntagResource",
-          "kms:ScheduleKeyDeletion",
-          "kms:CancelKeyDeletion"
-        ]
-        Resource = "*"
-        Condition = {
-          StringEquals = {
-            "aws:PrincipalTag/Role" = "Administrator"
-          }
-        }
       },
       {
         Sid    = "AllowCloudWatchLogsEncryption"
