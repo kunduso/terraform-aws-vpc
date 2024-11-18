@@ -16,14 +16,14 @@ This module provides a complete foundation for setting up secure, isolated envir
 | Name | Version |
 |------|---------|
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | 3.6.3 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 3.0.0 |
 
 ## Modules
 
@@ -53,7 +53,7 @@ No modules.
 | [aws_subnet.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
-| [random_string.vpc_name](https://registry.terraform.io/providers/hashicorp/random/3.6.3/docs/resources/string) | resource |
+| [random_string.vpc_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -104,7 +104,7 @@ To use this module in your Terraform configuration, include the following module
 
 ```hcl
 module "vpc" {
-  source = "github.com/kunduso/terraform-aws-vpc"
+  source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.0"
   region = var.region
 }
 ````
@@ -118,7 +118,6 @@ A complete example implementation of this module can be found in the [example di
 
 You can use this example as a reference for implementing the module in your own infrastructure code.
 </br> Additionally, the repository includes [Azure Pipelines](./pipeline/azure-pipelines.yaml) to automate the deployment of this infrastructure as part of a CI/CD pipeline. This makes it easy to apply your Terraform configurations directly from the pipeline.
-</br> Details available at [Exploring Azure Pipelines, Terraform, and Powershell](https://skundunotes.com/2021/02/25/exploring-azure-pipelines-terraform-and-powershell/)
 
 Note: Ensure you have appropriate AWS credentials configured before running the example.
 
