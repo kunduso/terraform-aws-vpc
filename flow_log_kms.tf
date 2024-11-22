@@ -17,7 +17,7 @@ resource "aws_kms_key" "custom_kms_key" {
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
 resource "aws_kms_alias" "key" {
   count         = var.enable_flow_log ? 1 : 0
-  name          = "alias/${local.vpc_name}"
+  name          = "alias/${local.vpc_name}-encrypt-flow-log"
   target_key_id = aws_kms_key.custom_kms_key[0].id
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key_policy
