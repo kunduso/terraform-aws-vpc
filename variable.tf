@@ -4,16 +4,16 @@ variable "region" {
 }
 variable "vpc_cidr" {
   description = "CIDR for the VPC."
-  default     = "10.20.30.0/24"
+  default     = ""
 }
 variable "subnet_cidr_private" {
   description = "CIDR blocks for the private subnets."
-  default     = ["10.20.30.0/27", "10.20.30.32/27", "10.20.30.64/27", "10.20.30.96/27"]
+  default     = []
   type        = list(any)
 }
 variable "subnet_cidr_public" {
   description = "CIDR blocks for the public subnets."
-  default     = ["10.20.30.128/27", "10.20.30.160/27", "10.20.30.192/27", "10.20.30.224/27"]
+  default     = []
   type        = list(any)
 }
 variable "enable_dns_hostnames" {

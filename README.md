@@ -69,9 +69,9 @@ No modules.
 | <a name="input_enable_internet_gateway"></a> [enable\_internet\_gateway](#input\_enable\_internet\_gateway) | Enable internet gateway for VPC. | `bool` | `false` | no |
 | <a name="input_enable_nat_gateway"></a> [enable\_nat\_gateway](#input\_enable\_nat\_gateway) | Enable nat gateway for VPC. | `bool` | `false` | no |
 | <a name="input_region"></a> [region](#input\_region) | The AWS region to provision resources. | `string` | n/a | yes |
-| <a name="input_subnet_cidr_private"></a> [subnet\_cidr\_private](#input\_subnet\_cidr\_private) | CIDR blocks for the private subnets. | `list(any)` | <pre>[<br/>  "10.20.30.0/27",<br/>  "10.20.30.32/27",<br/>  "10.20.30.64/27",<br/>  "10.20.30.96/27"<br/>]</pre> | no |
-| <a name="input_subnet_cidr_public"></a> [subnet\_cidr\_public](#input\_subnet\_cidr\_public) | CIDR blocks for the public subnets. | `list(any)` | <pre>[<br/>  "10.20.30.128/27",<br/>  "10.20.30.160/27",<br/>  "10.20.30.192/27",<br/>  "10.20.30.224/27"<br/>]</pre> | no |
-| <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR for the VPC. | `string` | `"10.20.30.0/24"` | no |
+| <a name="input_subnet_cidr_private"></a> [subnet\_cidr\_private](#input\_subnet\_cidr\_private) | CIDR blocks for the private subnets. | `list(any)` | `[]` | no |
+| <a name="input_subnet_cidr_public"></a> [subnet\_cidr\_public](#input\_subnet\_cidr\_public) | CIDR blocks for the public subnets. | `list(any)` | `[]` | no |
+| <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR for the VPC. | `string` | `""` | no |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name of the VPC. | `string` | `""` | no |
 
 ## Outputs
@@ -104,8 +104,14 @@ To use this module in your Terraform configuration, include the following module
 
 ```hcl
 module "vpc" {
-  source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.0"
-  region = var.region
+  source                  = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.2"
+  region                  = var.region
+  enable_internet_gateway = true
+  enable_nat_gateway      = true
+  vpc_cidr                = "10.20.30.0/24"
+  subnet_cidr_public      = ["10.20.30.0/27", "10.20.30.32/27", "10.20.30.64/27"]
+  subnet_cidr_private     = ["10.20.30.128/27", "10.20.30.160/27", "10.20.30.192/27"]
+  
 }
 ````
 ## Example Implementation

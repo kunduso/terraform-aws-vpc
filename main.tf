@@ -34,43 +34,44 @@ resource "aws_subnet" "public" {
   }
 }
 resource "aws_route_table" "private" {
-  count  = length(var.subnet_cidr_private)
+  count  = length(var.subnet_cidr_private) > 0 ? length(var.subnet_cidr_private) : 0
   vpc_id = aws_vpc.this.id
   tags = {
     "Name" = "${local.vpc_name}-private-${count.index + 1}"
   }
 }
 resource "aws_route_table" "public" {
+  count  = length(var.subnet_cidr_public) > 0 ? 1 : 0
   vpc_id = aws_vpc.this.id
   tags = {
     "Name" = "${local.vpc_name}-public"
   }
 }
 resource "aws_route_table_association" "private" {
-  count          = length(var.subnet_cidr_private)
+  count          = length(var.subnet_cidr_private) > 0 ? length(var.subnet_cidr_private) : 0
   subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = aws_route_table.private[count.index].id
 }
 resource "aws_route_table_association" "public" {
-  count          = length(var.subnet_cidr_public)
+  count          = length(var.subnet_cidr_public) > 0 ? length(var.subnet_cidr_public) : 0
   subnet_id      = element(aws_subnet.public.*.id, count.index)
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public[0].id
 }
 resource "aws_internet_gateway" "this_igw" {
-  count  = var.enable_internet_gateway ? 1 : 0
+  count  = var.enable_internet_gateway && length(var.subnet_cidr_public) > 0 ? 1 : 0
   vpc_id = aws_vpc.this.id
   tags = {
     "Name" = "${local.vpc_name}-gateway"
   }
 }
 resource "aws_route" "internet_route" {
-  count                  = var.enable_internet_gateway ? 1 : 0
+  count                  = var.enable_internet_gateway && length(var.subnet_cidr_public) > 0 ? 1 : 0
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.public.id
+  route_table_id         = aws_route_table.public[0].id
   gateway_id             = aws_internet_gateway.this_igw[0].id
 }
 resource "aws_eip" "nat_gateway" {
-  count  = (var.enable_nat_gateway && var.enable_internet_gateway) ? length(var.subnet_cidr_public) : 0
+  count  = (var.enable_nat_gateway && var.enable_internet_gateway && length(var.subnet_cidr_public) > 0) && (length(var.subnet_cidr_private) == length(var.subnet_cidr_public)) ? length(var.subnet_cidr_public) : 0
   domain = "vpc"
   #checkov:skip=CKV2_AWS_19: The IP is attached to the NAT gateway
   tags = {
@@ -78,7 +79,7 @@ resource "aws_eip" "nat_gateway" {
   }
 }
 resource "aws_nat_gateway" "public" {
-  count         = (var.enable_nat_gateway && var.enable_internet_gateway) ? length(var.subnet_cidr_public) : 0
+  count         = (var.enable_nat_gateway && var.enable_internet_gateway && length(var.subnet_cidr_public) > 0) && (length(var.subnet_cidr_private) == length(var.subnet_cidr_public)) ? length(var.subnet_cidr_public) : 0
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   allocation_id = aws_eip.nat_gateway[count.index].id
   depends_on    = [aws_internet_gateway.this_igw]
@@ -87,7 +88,7 @@ resource "aws_nat_gateway" "public" {
   }
 }
 resource "aws_route" "private_route" {
-  count                  = (var.enable_nat_gateway && var.enable_internet_gateway) ? length(var.subnet_cidr_private) : 0
+  count                  = (var.enable_nat_gateway && var.enable_internet_gateway && (length(var.subnet_cidr_private) == length(var.subnet_cidr_public)) && length(var.subnet_cidr_public) > 0) ? length(var.subnet_cidr_private) : 0
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.private[count.index].id
   nat_gateway_id         = aws_nat_gateway.public[count.index].id
