@@ -1,0 +1,83 @@
+#A template of this file is located at:
+# https://github.com/terraform-docs/terraform-docs/blob/master/examples/.terraform-docs.yml
+# # see: https://terraform-docs.io/user-guide/configuration/version
+# version: ">= 0.10, < 0.12"
+
+# see: https://terraform-docs.io/user-guide/configuration/formatter
+formatter: markdown table
+
+# see: https://terraform-docs.io/user-guide/configuration/header-from
+header-from: ./docs/header.md
+
+# see: https://terraform-docs.io/user-guide/configuration/footer-from
+footer-from: ./docs/footer.md
+
+# see: https://terraform-docs.io/user-guide/configuration/recursive
+# recursive:
+#   enabled: false
+#   path: modules
+#   include-main: false
+
+# see: https://terraform-docs.io/user-guide/configuration/sections
+sections:
+  show:
+    - header
+    - requirements
+    - providers
+    - modules
+    - resources
+    - inputs
+    - outputs
+    - footer
+
+# # see: https://terraform-docs.io/user-guide/configuration/content
+content: |-
+  {{ .Header }}
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Modules }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  ## Usage
+  To use this module in your Terraform configuration, include the following module block:
+
+  ```hcl
+  {{ include "example/main.tf" }}
+  ```
+  {{ .Footer }}
+# # see: https://terraform-docs.io/user-guide/configuration/output
+output:
+  file: README.md
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+# see: https://terraform-docs.io/user-guide/configuration/sort
+sort:
+  enabled: true
+  by: required
+
+# # https://terraform-docs.io/user-guide/configuration/output-values/
+# output-values:
+#   enabled: false
+#   from: ""
+
+# see: https://terraform-docs.io/user-guide/configuration/settings
+settings:
+  indent: 4
+  escape: false
+  default: true
+  required: true
+  type: true
+  hide-empty: true
+  read-comments: true
