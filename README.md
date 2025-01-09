@@ -65,6 +65,7 @@ This module provides foundation for setting up secure, isolated environments in 
 | <a name="input_enable_nat_gateway"></a> [enable_nat_gateway](#input_enable_nat_gateway) | Enable nat gateway for VPC. | `bool` | `false` | no |
 | <a name="input_subnet_cidr_private"></a> [subnet_cidr_private](#input_subnet_cidr_private) | CIDR blocks for the private subnets. | `list(any)` | `[]` | no |
 | <a name="input_subnet_cidr_public"></a> [subnet_cidr_public](#input_subnet_cidr_public) | CIDR blocks for the public subnets. | `list(any)` | `[]` | no |
+| <a name="input_tags"></a> [tags](#input_tags) | AWS Cloud resource tags. | `map(string)` | <pre>{<br/>  "Source": "https://github.com/kunduso/terraform-aws-vpc"<br/>}</pre> | no |
 | <a name="input_vpc_cidr"></a> [vpc_cidr](#input_vpc_cidr) | CIDR for the VPC. | `string` | `""` | no |
 | <a name="input_vpc_name"></a> [vpc_name](#input_vpc_name) | Name of the VPC. | `string` | `""` | no |
 
@@ -105,6 +106,11 @@ module "vpc" {
   vpc_cidr                = "10.20.30.0/24"
   subnet_cidr_public      = ["10.20.30.0/27", "10.20.30.32/27", "10.20.30.64/27"]
   subnet_cidr_private     = ["10.20.30.128/27", "10.20.30.160/27", "10.20.30.192/27"]
+  tags = {
+    Application_ID = "12345"
+    Environment    = "dev"
+    Source         = "https://github.com/kunduso/terraform-aws-vpc"
+  }
   #CKV_TF_1: Ensure Terraform module sources use a commit hash
   #checkov:skip=CKV_TF_1: This is a self hosted module where the version number is tagged rather than the commit hash.
 }
