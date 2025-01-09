@@ -1,5 +1,5 @@
 module "vpc" {
-  # source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.2"
+  # source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.3"
   source                  = "../"
   region                  = var.region
   enable_internet_gateway = true

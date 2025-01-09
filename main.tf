@@ -50,9 +50,7 @@ resource "aws_route_table_association" "public" {
 resource "aws_internet_gateway" "this_igw" {
   count  = var.enable_internet_gateway && length(var.subnet_cidr_public) > 0 ? 1 : 0
   vpc_id = aws_vpc.this.id
-  tags = {
-    "Name" = "${local.vpc_name}-gateway"
-  }
+  tags   = merge({ "Name" = "${local.vpc_name}-gateway" }, var.tags)
 }
 resource "aws_route" "internet_route" {
   count                  = var.enable_internet_gateway && length(var.subnet_cidr_public) > 0 ? 1 : 0
