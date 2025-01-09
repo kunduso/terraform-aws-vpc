@@ -8,6 +8,7 @@ resource "aws_flow_log" "network_flow_logging" {
   tags            = merge({ "Name" = "${local.flow_log}" }, var.tags)
 }
 
+#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group
 resource "aws_cloudwatch_log_group" "network_flow_logging" {
   count             = var.enable_flow_log ? 1 : 0
   name              = local.flow_log
@@ -16,6 +17,7 @@ resource "aws_cloudwatch_log_group" "network_flow_logging" {
   tags              = merge({ "Name" = "${local.flow_log}" }, var.tags)
 }
 
+#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -27,6 +29,7 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
+#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role
 resource "aws_iam_role" "vpc_flow_log_role" {
   count              = var.enable_flow_log ? 1 : 0
   name               = "${local.vpc_name}-vpc-flow-role"
