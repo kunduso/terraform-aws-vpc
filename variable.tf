@@ -2,6 +2,13 @@ variable "region" {
   description = "The AWS region to provision resources."
   type        = string
 }
+variable "tags" {
+  description = "AWS Cloud resource tags."
+  type        = map(string)
+  default = {
+    "Source" = "https://github.com/kunduso/terraform-aws-vpc"
+  }
+}
 variable "vpc_cidr" {
   description = "CIDR for the VPC."
   default     = ""

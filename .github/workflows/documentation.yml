@@ -21,5 +21,6 @@ jobs:
       with:
         working-dir: .
         output-file: README.md
+        config-file: docs.yml
         output-method: inject
         git-push: "true"
