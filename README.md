@@ -129,7 +129,7 @@ You can use this example as a reference for implementing the module in your own 
 Note: Ensure you have appropriate AWS credentials configured before running the example.
 
 ## Contributing
-If you find any issues or have suggestions for improvement, feel free to open an issue or submit a pull request. Contributions are always welcome!
+If you find any issues or have suggestions for improvement, feel free to open an [issue](https://github.com/kunduso/terraform-aws-vpc/issues/new) or submit a pull request. Contributions are always welcome!
 ## License
 This code is released under the Unlicense License. See [LICENSE](https://github.com/kunduso/terraform-aws-vpc/blob/main/LICENSE).
 <!-- END_TF_DOCS -->
