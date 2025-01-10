@@ -11,14 +11,14 @@ This module provides foundation for setting up secure, isolated environments in 
 - Built-in security best practices
 - Configurable NAT gateways for private subnet access
 
-#### Requirements
+## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_aws"></a> [aws](#requirement_aws) | >= 5.0.0 |
 | <a name="requirement_random"></a> [random](#requirement_random) | >= 3.0.0 |
 
-#### Providers
+## Providers
 
 | Name | Version |
 |------|---------|
@@ -27,7 +27,7 @@ This module provides foundation for setting up secure, isolated environments in 
 
 
 
-#### Resources
+## Resources
 
 | Name | Type |
 |------|------|
@@ -53,7 +53,7 @@ This module provides foundation for setting up secure, isolated environments in 
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [random_string.vpc_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 
-#### Inputs
+## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
@@ -69,7 +69,7 @@ This module provides foundation for setting up secure, isolated environments in 
 | <a name="input_vpc_cidr"></a> [vpc_cidr](#input_vpc_cidr) | CIDR for the VPC. | `string` | `""` | no |
 | <a name="input_vpc_name"></a> [vpc_name](#input_vpc_name) | Name of the VPC. | `string` | `""` | no |
 
-#### Outputs
+## Outputs
 
 | Name | Description |
 |------|-------------|
