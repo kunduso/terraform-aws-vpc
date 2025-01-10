@@ -98,8 +98,8 @@ To use this module in your Terraform configuration, include the following module
 
 ```hcl
 module "vpc" {
-  # source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.3"
-  source                  = "../"
+  source                  = "kunduso/vpc/aws"
+  version                 = "1.0.3"
   region                  = var.region
   enable_internet_gateway = true
   enable_nat_gateway      = true
