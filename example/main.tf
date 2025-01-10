@@ -1,6 +1,5 @@
 module "vpc" {
-  # source = "github.com/kunduso/terraform-aws-vpc?ref=v1.0.3"
-  source                  = "../"
+  source                  = "kunduso/vpc/aws"
   region                  = var.region
   enable_internet_gateway = true
   enable_nat_gateway      = true
@@ -12,6 +11,4 @@ module "vpc" {
     Environment    = "dev"
     Source         = "https://github.com/kunduso/terraform-aws-vpc"
   }
-  #CKV_TF_1: Ensure Terraform module sources use a commit hash
-  #checkov:skip=CKV_TF_1: This is a self hosted module where the version number is tagged rather than the commit hash.
 }
