@@ -74,7 +74,7 @@ sort:
 
 # see: https://terraform-docs.io/user-guide/configuration/settings
 settings:
-  indent: 4
+  indent: 2
   escape: false
   default: true
   required: true
