@@ -1,9 +1,8 @@
-provider "aws" {
-  region = "us-east-2" # Match the region from your pipeline configuration
-}
+provider "aws" {}
 variables {
   vpc_name                = "test-vpc-minimal"
   vpc_cidr                = "172.16.0.0/16"
+  region                  = "us-east-1"
   enable_dns_support      = false
   enable_dns_hostnames    = false
   subnet_cidr_private     = []
