@@ -52,14 +52,14 @@ run "vpc_minimal_validation" {
     error_message = "DNS hostnames should be enabled by default"
   }
 
-  # Check IPv6 is not configured
+  # Check IPv6 is not configured - handle both null and empty string cases
   assert {
-    condition     = aws_vpc.this.ipv6_cidr_block == null
+    condition     = coalesce(aws_vpc.this.ipv6_cidr_block, "") == ""
     error_message = "IPv6 CIDR block should not be assigned in minimal configuration"
   }
 
   assert {
-    condition     = aws_vpc.this.ipv6_association_id == null
+    condition     = coalesce(aws_vpc.this.ipv6_association_id, "") == ""
     error_message = "No IPv6 association should exist in minimal configuration"
   }
 
