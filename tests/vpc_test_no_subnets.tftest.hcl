@@ -1,4 +1,6 @@
-provider "aws" {}
+provider "aws" {
+  region = "us-east-1"
+}
 variables {
   vpc_name                = "test-vpc-minimal"
   vpc_cidr                = "172.16.0.0/16"
