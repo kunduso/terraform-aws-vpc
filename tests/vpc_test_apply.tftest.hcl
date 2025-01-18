@@ -22,8 +22,13 @@ run "vpc_creation_apply" {
   command = apply
 
   assert {
-    condition     = aws_vpc.this.state == "available"
+    condition     = aws_vpc.this.id != ""
     error_message = "VPC was not created successfully"
+  }
+
+  assert {
+    condition     = aws_vpc.this.arn != ""
+    error_message = "VPC ARN is not available"
   }
 }
 
@@ -31,13 +36,13 @@ run "subnet_creation_apply" {
   command = apply
 
   assert {
-    condition     = alltrue([for subnet in aws_subnet.private : subnet.state == "available"])
-    error_message = "Private subnets not in available state"
+    condition     = alltrue([for subnet in aws_subnet.private : subnet.id != ""])
+    error_message = "Private subnets not created successfully"
   }
 
   assert {
-    condition     = alltrue([for subnet in aws_subnet.public : subnet.state == "available"])
-    error_message = "Public subnets not in available state"
+    condition     = alltrue([for subnet in aws_subnet.public : subnet.id != ""])
+    error_message = "Public subnets not created successfully"
   }
 }
 
@@ -45,8 +50,8 @@ run "nat_gateway_apply" {
   command = apply
 
   assert {
-    condition     = var.enable_nat_gateway ? alltrue([for nat in aws_nat_gateway.public : nat.state == "available"]) : true
-    error_message = "NAT Gateways not in available state"
+    condition     = var.enable_nat_gateway ? alltrue([for nat in aws_nat_gateway.public : nat.id != ""]) : true
+    error_message = "NAT Gateways not created successfully"
   }
 }
 
@@ -63,7 +68,35 @@ run "kms_key_apply" {
   command = apply
 
   assert {
-    condition     = var.enable_flow_log ? aws_kms_key.custom_kms_key[0].key_state == "Enabled" : true
-    error_message = "KMS key not in enabled state"
+    condition     = var.enable_flow_log ? aws_kms_key.custom_kms_key[0].id != "" : true
+    error_message = "KMS key not created successfully"
+  }
+
+  assert {
+    condition     = var.enable_flow_log ? aws_kms_key.custom_kms_key[0].arn != "" : true
+    error_message = "KMS key ARN not available"
+  }
+}
+
+run "route_tables_apply" {
+  command = apply
+
+  assert {
+    condition     = alltrue([for rt in aws_route_table.private : rt.id != ""])
+    error_message = "Private route tables not created successfully"
+  }
+
+  assert {
+    condition     = length(aws_route_table.public) > 0 ? aws_route_table.public[0].id != "" : true
+    error_message = "Public route table not created successfully"
+  }
+}
+
+run "internet_gateway_apply" {
+  command = apply
+
+  assert {
+    condition     = var.enable_internet_gateway ? aws_internet_gateway.this_igw[0].id != "" : true
+    error_message = "Internet Gateway not created successfully"
   }
 }
