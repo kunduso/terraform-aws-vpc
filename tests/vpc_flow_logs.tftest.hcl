@@ -116,17 +116,17 @@ run "default_security_group_validation" {
   command = plan
 
   assert {
-    condition     = length(aws_default_security_group.this.ingress) == 0
+    condition     = length(aws_default_security_group.default.ingress) == 0
     error_message = "Default security group should have no ingress rules"
   }
 
   assert {
-    condition     = length(aws_default_security_group.this.egress) == 0
+    condition     = length(aws_default_security_group.default.egress) == 0
     error_message = "Default security group should have no egress rules"
   }
 
   assert {
-    condition     = contains(keys(aws_default_security_group.this.tags), "Name")
+    condition     = contains(keys(aws_default_security_group.default.tags), "Name")
     error_message = "Default security group should have Name tag"
   }
 }
