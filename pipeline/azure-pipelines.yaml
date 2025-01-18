@@ -16,7 +16,6 @@ jobs:
 - job: Test
   variables:
     terraformVersion: '1.9.8'  # Specify the Terraform version
-    awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
     workingDirectory: 'example'  # Set working directory to 'example'
     githubToken: $(GH_TOKEN)  # GitHub token from pipeline secret variable
     githubOwner: 'kunduso'  # GitHub user/organization
