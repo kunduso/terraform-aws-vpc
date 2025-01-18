@@ -36,7 +36,11 @@ run "vpc_minimal_creation" {
 }
 
 run "vpc_minimal_validation" {
-  command = plan
+  command = apply
+  variables {
+    enable_dns_hostnames = true
+    enable_dns_support = true
+  }
 
   assert {
     condition     = aws_vpc.this.enable_dns_support == true
