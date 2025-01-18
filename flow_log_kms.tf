@@ -11,7 +11,9 @@ resource "aws_kms_key" "custom_kms_key" {
   description             = "KMS key for ${local.vpc_name}"
   deletion_window_in_days = 7
   enable_key_rotation     = true
-  tags                    = merge({ Name = "${local.vpc_name}-encryption-key" }, var.tags)
+  #checkov:skip=CKV2_AWS_64: "Ensure KMS key Policy is defined"
+  #KMS Key policy is defined as aws_kms_key_policy encrypt_log {}
+  tags = merge({ Name = "${local.vpc_name}-encryption-key" }, var.tags)
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
 resource "aws_kms_alias" "key" {
