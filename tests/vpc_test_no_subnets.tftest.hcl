@@ -39,7 +39,7 @@ run "vpc_minimal_validation" {
   command = apply
   variables {
     enable_dns_hostnames = true
-    enable_dns_support = true
+    enable_dns_support   = true
   }
 
   assert {
