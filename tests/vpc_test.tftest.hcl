@@ -146,7 +146,7 @@ run "nat_gateway_validation" {
   }
 
   assert {
-    condition     = !var.enable_nat_gateway || length(aws_eip.nat) > 0
+    condition     = !var.enable_nat_gateway || length(aws_eip.nat_gateway) > 0
     error_message = "EIPs should be created when NAT Gateway is enabled"
   }
 }
