@@ -32,6 +32,19 @@ run "vpc_minimal_creation" {
   }
 }
 
+run "vpc_minimal_validation" {
+  command = plan
+
+  assert {
+    condition     = aws_vpc.this.enable_classiclink == null
+    error_message = "Classic Link should not be enabled in minimal VPC"
+  }
+
+  assert {
+    condition     = aws_vpc.this.assign_generated_ipv6_cidr_block == false
+    error_message = "IPv6 CIDR block should not be assigned in minimal configuration"
+  }
+}
 run "no_subnets" {
   command = plan
 

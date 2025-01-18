@@ -38,6 +38,19 @@ run "vpc_creation" {
   }
 }
 
+run "vpc_cidr_validation" {
+  command = plan
+
+  assert {
+    condition     = can(cidrhost(aws_vpc.this.cidr_block, 0))
+    error_message = "VPC CIDR block is not in valid format"
+  }
+
+  assert {
+    condition     = aws_vpc.this.instance_tenancy == "default"
+    error_message = "VPC instance tenancy should be default"
+  }
+}
 run "subnet_creation" {
   command = plan
 
@@ -52,6 +65,29 @@ run "subnet_creation" {
   }
 }
 
+run "subnet_configuration" {
+  command = plan
+
+  assert {
+    condition     = length(aws_subnet.private) == length(var.subnet_cidr_private)
+    error_message = "Number of private subnets doesn't match specified CIDR blocks"
+  }
+
+  assert {
+    condition     = length(aws_subnet.public) == length(var.subnet_cidr_public)
+    error_message = "Number of public subnets doesn't match specified CIDR blocks"
+  }
+
+  assert {
+    condition     = alltrue([for subnet in aws_subnet.private : subnet.map_public_ip_on_launch == false])
+    error_message = "Private subnets should not auto-assign public IPs"
+  }
+
+  assert {
+    condition     = alltrue([for subnet in aws_subnet.public : subnet.map_public_ip_on_launch == true])
+    error_message = "Public subnets should auto-assign public IPs"
+  }
+}
 run "route_table_creation" {
   command = plan
 
@@ -80,11 +116,56 @@ run "nat_gateway_creation" {
   }
 }
 
+run "route_table_validation" {
+  command = plan
+
+  assert {
+    condition     = length(aws_route_table.private) == length(aws_subnet.private)
+    error_message = "Each private subnet should have a route table"
+  }
+
+  assert {
+    condition     = length(aws_route_table.public) == (var.enable_internet_gateway ? 1 : 0)
+    error_message = "Public route table should exist only when IGW is enabled"
+  }
+}
 run "internet_gateway_creation" {
   command = plan
 
   assert {
     condition     = length(aws_internet_gateway.this_igw) == 1
     error_message = "Expected exactly one Internet Gateway"
+  }
+}
+run "nat_gateway_validation" {
+  command = plan
+
+  assert {
+    condition     = length(aws_nat_gateway.public) == (var.enable_nat_gateway ? length(aws_subnet.public) : 0)
+    error_message = "NAT Gateway count should match public subnets when enabled"
+  }
+
+  assert {
+    condition     = !var.enable_nat_gateway || length(aws_eip.nat) > 0
+    error_message = "EIPs should be created when NAT Gateway is enabled"
+  }
+}
+
+run "tag_validation" {
+  command = plan
+
+  assert {
+    condition     = aws_vpc.this.tags["Environment"] == var.tags["Environment"]
+    error_message = "VPC should have correct Environment tag"
+  }
+
+  assert {
+    condition     = alltrue([for subnet in aws_subnet.private : contains(keys(subnet.tags), "Name")])
+    error_message = "All private subnets should have Name tags"
+  }
+
+  assert {
+    condition     = alltrue([for subnet in aws_subnet.public : contains(keys(subnet.tags), "Name")])
+    error_message = "All public subnets should have Name tags"
   }
 }
