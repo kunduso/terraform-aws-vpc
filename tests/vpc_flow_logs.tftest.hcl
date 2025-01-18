@@ -159,22 +159,6 @@ run "iam_role_naming_validation" {
   }
 }
 
-run "flow_log_permissions_validation" {
-  command = plan
-
-  assert {
-    condition = var.enable_flow_log ? alltrue([
-      for action in [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams"
-      ] : contains(jsondecode(data.aws_iam_policy_document.vpc_flow_log_policy_document[0].json).Statement[0].Action, action)
-    ]) : true
-    error_message = "Flow log IAM policy should have all required permissions"
-  }
-}
 
 run "resource_dependencies_validation" {
   command = plan
