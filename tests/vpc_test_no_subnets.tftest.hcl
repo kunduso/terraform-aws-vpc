@@ -20,7 +20,10 @@ variables {
 
 run "vpc_minimal_creation" {
   command = plan
-
+  assert {
+    condition     = aws_vpc.this.cidr_block == var.vpc_cidr
+    error_message = "VPC CIDR block does not match expected value"
+  }
   assert {
     condition     = aws_vpc.this.enable_dns_support == false
     error_message = "VPC DNS support should be disabled"
@@ -36,13 +39,35 @@ run "vpc_minimal_validation" {
   command = plan
 
   assert {
-    condition     = aws_vpc.this.enable_classiclink == null
-    error_message = "Classic Link should not be enabled in minimal VPC"
+    condition     = aws_vpc.this.enable_dns_support == true
+    error_message = "DNS support should be enabled by default"
   }
 
   assert {
-    condition     = aws_vpc.this.assign_generated_ipv6_cidr_block == false
+    condition     = aws_vpc.this.enable_dns_hostnames == true
+    error_message = "DNS hostnames should be enabled by default"
+  }
+
+  # Check IPv6 is not configured
+  assert {
+    condition     = aws_vpc.this.ipv6_cidr_block == null
     error_message = "IPv6 CIDR block should not be assigned in minimal configuration"
+  }
+
+  assert {
+    condition     = aws_vpc.this.ipv6_association_id == null
+    error_message = "No IPv6 association should exist in minimal configuration"
+  }
+
+  # Verify tags
+  assert {
+    condition     = contains(keys(aws_vpc.this.tags), "Name")
+    error_message = "VPC should have a Name tag"
+  }
+
+  assert {
+    condition     = aws_vpc.this.tags["Name"] == var.vpc_name
+    error_message = "VPC Name tag should match vpc_name variable"
   }
 }
 run "no_subnets" {
