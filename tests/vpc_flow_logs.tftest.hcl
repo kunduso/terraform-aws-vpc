@@ -39,18 +39,59 @@ run "flow_log_validation" {
 }
 
 run "flow_log_iam_validation" {
-  command = plan
+  command = apply
 
   assert {
-    condition     = var.enable_flow_log ? contains(jsondecode(aws_iam_role.vpc_flow_log_role[0].assume_role_policy).Statement[0].Principal.Service, "vpc-flow-logs.amazonaws.com") : true
+    condition     = var.enable_flow_log ? jsondecode(aws_iam_role.vpc_flow_log_role[0].assume_role_policy).Statement[0].Principal.Service == "vpc-flow-logs.amazonaws.com" : true
     error_message = "Flow log IAM role should be assumable by vpc-flow-logs service"
   }
 
   assert {
-    condition     = var.enable_flow_log ? contains(jsondecode(data.aws_iam_policy_document.vpc_flow_log_policy_document[0].json).Statement[0].Action, "logs:CreateLogStream") : true
-    error_message = "Flow log IAM policy should allow CreateLogStream"
+    condition     = var.enable_flow_log ? contains(jsondecode(aws_iam_role.vpc_flow_log_role[0].assume_role_policy).Statement[*].Action, "sts:AssumeRole") : true
+    error_message = "Flow log IAM role should allow sts:AssumeRole"
   }
 }
+
+run "flow_log_policy_validation" {
+  command = plan
+
+  assert {
+    condition = var.enable_flow_log ? alltrue([
+      for statement in jsondecode(aws_iam_role_policy.vpc_flow_log_role_policy[0].policy).Statement :
+      contains(statement.Action, "logs:CreateLogStream")
+    ]) : true
+    error_message = "Flow log IAM policy should allow CreateLogStream"
+  }
+
+  assert {
+    condition = var.enable_flow_log ? alltrue([
+      for statement in jsondecode(aws_iam_role_policy.vpc_flow_log_role_policy[0].policy).Statement :
+      statement.Effect == "Allow"
+    ]) : true
+    error_message = "Flow log IAM policy statements should have Allow effect"
+  }
+}
+
+run "flow_log_permissions_validation" {
+  command = plan
+
+  assert {
+    condition = var.enable_flow_log ? alltrue([
+      for required_action in [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+        ] : anytrue([
+          for statement in jsondecode(aws_iam_role_policy.vpc_flow_log_role_policy[0].policy).Statement :
+          contains(statement.Action, required_action)
+      ])
+    ]) : true
+    error_message = "Flow log IAM policy missing required permissions"
+  }
+}
+
 
 run "kms_key_validation" {
   command = plan
