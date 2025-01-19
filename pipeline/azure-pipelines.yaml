@@ -47,11 +47,11 @@ jobs:
     #   displayName: 'Terraform Init'
     #   workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # # Terraform validation
-    # - script: |
-    #     terraform validate
-    #   displayName: 'Terraform Validate'
-    #   workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+    # Terraform validation
+    - script: |
+        terraform validate
+      displayName: 'Terraform Validate'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
     # Add Terraform Format Check
     - script: |
