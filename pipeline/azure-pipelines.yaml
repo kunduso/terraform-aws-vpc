@@ -13,13 +13,54 @@ variables:
 - group: GH_TOKEN
 
 jobs:
-- job: Test
+- job: Validate
   variables:
     terraformVersion: '1.9.8'  # Specify the Terraform version
     workingDirectory: 'example'  # Set working directory to 'example'
-    githubToken: $(GH_TOKEN)  # GitHub token from pipeline secret variable
-    githubOwner: 'kunduso'  # GitHub user/organization
-    githubRepo: 'terraform-aws-vpc'  # GitHub repository name
+
+  displayName: 'Validate Configuration'
+  pool:
+    vmImage: 'ubuntu-latest'  # Use an Ubuntu agent
+
+  steps:
+    # Install Terraform using a script
+    - script: |
+        curl -sLo terraform.zip https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        terraform --version
+      displayName: 'Install Terraform'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+    
+    # Terraform initialization
+    - script: |
+        terraform init \
+          -backend-config="bucket=kunduso-terraform-remote-bucket" \
+          -backend-config="key=tf/terraform-aws-vpc/terraform.tfstate" \
+          -backend-config="region=$(awsRegion)" \
+          -backend-config="access_key=$(access_key)" \
+          -backend-config="secret_key=$(secret_key)" \
+          -no-color
+      displayName: 'Terraform Init'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+  
+    # Terraform validation
+    - script: |
+        terraform validate
+      displayName: 'Terraform Validate'
+      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
+
+    # Add Terraform Format Check
+    - script: |
+        terraform fmt -check -recursive
+      displayName: 'Terraform Format Check'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+- job: Test
+  dependsOn: Validate
+  variables:
+    terraformVersion: '1.9.8'  # Specify the Terraform version
+    workingDirectory: 'example'  # Set working directory to 'example'
 
   displayName: 'Test Configuration'
   pool:
@@ -34,30 +75,6 @@ jobs:
         terraform --version
       displayName: 'Install Terraform'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-  
-    # # Terraform initialization
-    # - script: |
-    #     terraform init \
-    #       -backend-config="bucket=kunduso-terraform-remote-bucket" \
-    #       -backend-config="key=tf/terraform-aws-vpc/terraform.tfstate" \
-    #       -backend-config="region=$(awsRegion)" \
-    #       -backend-config="access_key=$(access_key)" \
-    #       -backend-config="secret_key=$(secret_key)" \
-    #       -no-color
-    #   displayName: 'Terraform Init'
-    #   workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-
-    # Terraform validation
-    - script: |
-        terraform validate
-      displayName: 'Terraform Validate'
-      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-
-    # Add Terraform Format Check
-    - script: |
-        terraform fmt -check -recursive
-      displayName: 'Terraform Format Check'
-      workingDirectory: $(System.DefaultWorkingDirectory)
 
     # Terraform Test
     - script: |
