@@ -53,11 +53,11 @@ jobs:
     #   displayName: 'Terraform Validate'
     #   workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # # Add Terraform Format Check
-    # - script: |
-    #     terraform fmt -check -recursive
-    #   displayName: 'Terraform Format Check'
-    #   workingDirectory: $(System.DefaultWorkingDirectory)
+    # Add Terraform Format Check
+    - script: |
+        terraform fmt -check -recursive
+      displayName: 'Terraform Format Check'
+      workingDirectory: $(System.DefaultWorkingDirectory)
 
     # Terraform Test
     - script: |
