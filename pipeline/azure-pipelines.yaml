@@ -17,6 +17,7 @@ jobs:
   variables:
     terraformVersion: '1.9.8'  # Specify the Terraform version
     workingDirectory: 'example'  # Set working directory to 'example'
+    awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
 
   displayName: 'Validate Configuration'
   pool:
