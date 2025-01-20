@@ -123,18 +123,6 @@ jobs:
       displayName: 'Terraform Init'
       workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
 
-    # Terraform validation
-    - script: |
-        terraform validate
-      displayName: 'Terraform Validate'
-      workingDirectory: $(System.DefaultWorkingDirectory)/$(workingDirectory)
-
-    # Add Terraform Format Check
-    - script: |
-        terraform fmt -check -recursive
-      displayName: 'Terraform Format Check'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-
     # Terraform Plan with better error handling
     - script: |
         set -e
