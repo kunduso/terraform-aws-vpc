@@ -58,6 +58,7 @@ This module provides foundation for setting up secure, isolated environments in 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_region"></a> [region](#input_region) | The AWS region to provision resources. | `string` | n/a | yes |
+| <a name="input_vpc_cidr"></a> [vpc_cidr](#input_vpc_cidr) | The CIDR block for the VPC | `string` | n/a | yes |
 | <a name="input_enable_dns_hostnames"></a> [enable_dns_hostnames](#input_enable_dns_hostnames) | Enable DNS hostnames for VPC. | `bool` | `false` | no |
 | <a name="input_enable_dns_support"></a> [enable_dns_support](#input_enable_dns_support) | Enable DNS support for VPC. | `bool` | `false` | no |
 | <a name="input_enable_flow_log"></a> [enable_flow_log](#input_enable_flow_log) | Enable VPC flow logs | `bool` | `true` | no |
@@ -66,7 +67,6 @@ This module provides foundation for setting up secure, isolated environments in 
 | <a name="input_subnet_cidr_private"></a> [subnet_cidr_private](#input_subnet_cidr_private) | CIDR blocks for the private subnets. | `list(any)` | `[]` | no |
 | <a name="input_subnet_cidr_public"></a> [subnet_cidr_public](#input_subnet_cidr_public) | CIDR blocks for the public subnets. | `list(any)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input_tags) | AWS Cloud resource tags. | `map(string)` | <pre>{<br/>  "Source": "https://github.com/kunduso/terraform-aws-vpc"<br/>}</pre> | no |
-| <a name="input_vpc_cidr"></a> [vpc_cidr](#input_vpc_cidr) | CIDR for the VPC. | `string` | `""` | no |
 | <a name="input_vpc_name"></a> [vpc_name](#input_vpc_name) | Name of the VPC. | `string` | `""` | no |
 
 ## Outputs

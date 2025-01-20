@@ -33,7 +33,7 @@ resource "aws_kms_key_policy" "encrypt_log" {
         Action = ["kms:*"]
         Effect = "Allow"
         Principal = {
-          AWS = "${local.principal_root_arn}"
+          AWS = local.principal_root_arn
         }
         Resource = "*"
       },
@@ -41,20 +41,32 @@ resource "aws_kms_key_policy" "encrypt_log" {
         Sid    = "AllowCloudWatchLogsEncryption"
         Effect = "Allow"
         Principal = {
-          Service = "${local.principal_logs_arn}"
+          Service = local.principal_logs_arn
         }
         Action = [
           "kms:Encrypt",
           "kms:Decrypt",
-          "kms:ReEncryptFrom",
-          "kms:ReEncryptTo",
-          "kms:GenerateDataKey",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
           "kms:DescribeKey"
         ]
         Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsEncryptionContext"
+        Effect = "Allow"
+        Principal = {
+          Service = local.principal_logs_arn
+        }
+        Action = [
+          "kms:CreateGrant",
+          "kms:ListGrants",
+          "kms:RevokeGrant"
+        ]
+        Resource = "*"
         Condition = {
-          ArnEquals = {
-            "kms:EncryptionContext:aws:logs:arn" = [local.flow_log_group_arn]
+          Bool = {
+            "kms:GrantIsForAWSResource" : "true"
           }
         }
       }
