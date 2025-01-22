@@ -93,8 +93,10 @@ jobs:
       displayName: 'Terraform Tests'
 
 - job: Provision
-  dependsOn: Test
-  condition: succeeded()
+  dependsOn: 
+    - Test
+    - Validate
+  condition: and (succeeded('Test'), succeeded('Validate'))
   variables:
     terraformVersion: '1.9.8'  # Specify the Terraform version
     awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
