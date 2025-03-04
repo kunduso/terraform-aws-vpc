@@ -86,7 +86,7 @@ jobs:
     # Terraform Test
     - script: |
         terraform init
-        terraform test
+        terraform test -junit-xml test_result.xml
       env:
         AWS_ACCESS_KEY_ID: $(test_access_key)
         AWS_SECRET_ACCESS_KEY: $(test_secret_key)
