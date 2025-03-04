@@ -22,7 +22,7 @@ variables:
 jobs:
 - job: Validate
   variables:
-    terraformVersion: '1.9.8'  # Specify the Terraform version
+    terraformVersion: '1.11.0'  # Specify the Terraform version
     workingDirectory: 'example'  # Set working directory to 'example'
     awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
 
@@ -66,7 +66,7 @@ jobs:
 
 - job: Test
   variables:
-    terraformVersion: '1.9.8'  # Specify the Terraform version
+    terraformVersion: '1.11.0'  # Specify the Terraform version
     workingDirectory: 'example'  # Set working directory to 'example'
 
   displayName: 'Test Terraform Configuration'
@@ -86,7 +86,7 @@ jobs:
     # Terraform Test
     - script: |
         terraform init
-        terraform test
+        terraform test -junit-xml test_result.xml
       env:
         AWS_ACCESS_KEY_ID: $(test_access_key)
         AWS_SECRET_ACCESS_KEY: $(test_secret_key)
@@ -98,7 +98,7 @@ jobs:
     - Validate
   condition: and (succeeded('Test'), succeeded('Validate'))
   variables:
-    terraformVersion: '1.9.8'  # Specify the Terraform version
+    terraformVersion: '1.11.0'  # Specify the Terraform version
     awsRegion: 'us-east-2'  # AWS Region to deploy to (adjust as needed)
     workingDirectory: 'example'  # Set working directory to 'example'
     githubToken: $(GH_TOKEN)  # GitHub token from pipeline secret variable
