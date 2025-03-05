@@ -91,6 +91,11 @@ jobs:
         AWS_ACCESS_KEY_ID: $(test_access_key)
         AWS_SECRET_ACCESS_KEY: $(test_secret_key)
       displayName: 'Terraform Tests'
+    # Publish test results to Azure Pipelines
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: "test_result.xml"
 
 - job: Provision
   dependsOn: 
