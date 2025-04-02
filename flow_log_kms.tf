@@ -1,9 +1,10 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 locals {
   flow_log           = "${local.vpc_name}-flow-logs"
   principal_root_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-  principal_logs_arn = "logs.${var.region}.amazonaws.com"
-  flow_log_group_arn = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.flow_log}"
+  principal_logs_arn = "logs.${data.aws_region.current.name}.amazonaws.com"
+  flow_log_group_arn = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.flow_log}"
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
 resource "aws_kms_key" "custom_kms_key" {
