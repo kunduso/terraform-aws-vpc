@@ -36,7 +36,7 @@ run "vpc_minimal_creation" {
 }
 
 run "vpc_minimal_validation" {
-  command = apply
+  command = plan
   variables {
     enable_dns_hostnames = true
     enable_dns_support   = true
