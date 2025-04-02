@@ -66,7 +66,7 @@ This module provides foundation for setting up secure, isolated environments in 
 | <a name="input_enable_nat_gateway"></a> [enable_nat_gateway](#input_enable_nat_gateway) | Enable nat gateway for VPC. | `bool` | `false` | no |
 | <a name="input_subnet_cidr_private"></a> [subnet_cidr_private](#input_subnet_cidr_private) | CIDR blocks for the private subnets. | `list(any)` | `[]` | no |
 | <a name="input_subnet_cidr_public"></a> [subnet_cidr_public](#input_subnet_cidr_public) | CIDR blocks for the public subnets. | `list(any)` | `[]` | no |
-| <a name="input_tags"></a> [tags](#input_tags) | AWS Cloud resource tags. | `map(string)` | <pre>{<br/>  "Source": "https://github.com/kunduso/terraform-aws-vpc"<br/>}</pre> | no |
+| <a name="input_tags"></a> [tags](#input_tags) | AWS Cloud resource tags. | `map(string)` | <pre>{<br/>  "Module": "https://github.com/kunduso/terraform-aws-vpc"<br/>}</pre> | no |
 | <a name="input_vpc_name"></a> [vpc_name](#input_vpc_name) | Name of the VPC. | `string` | `""` | no |
 
 ## Outputs
