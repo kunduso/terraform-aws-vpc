@@ -13,7 +13,7 @@ resource "aws_kms_key" "custom_kms_key" {
   enable_key_rotation     = true
   #checkov:skip=CKV2_AWS_64: "Ensure KMS key Policy is defined"
   #KMS Key policy is defined as aws_kms_key_policy encrypt_log {}
-  tags = merge({ Name = "${local.vpc_name}-encryption-key" }, var.tags)
+  tags = merge(var.tags, {Name = "${local.vpc_name}-encryption-key"})
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
 resource "aws_kms_alias" "key" {
