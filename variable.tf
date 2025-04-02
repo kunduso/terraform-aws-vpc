@@ -11,7 +11,7 @@ variable "tags" {
   description = "AWS Cloud resource tags."
   type        = map(string)
   default = {
-    "Source" = "https://github.com/kunduso/terraform-aws-vpc"
+    "Module" = "https://github.com/kunduso/terraform-aws-vpc"
   }
 
   validation {

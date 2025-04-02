@@ -11,6 +11,7 @@ variables {
   subnet_cidr_public      = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
   enable_nat_gateway      = true
   enable_internet_gateway = true
+  enable_flow_log         = true
   tags = {
     Environment = "test"
     Terraform   = "true"

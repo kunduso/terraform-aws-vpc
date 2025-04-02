@@ -1,9 +1,10 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 locals {
   flow_log           = "${local.vpc_name}-flow-logs"
   principal_root_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-  principal_logs_arn = "logs.${var.region}.amazonaws.com"
-  flow_log_group_arn = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.flow_log}"
+  principal_logs_arn = "logs.${data.aws_region.current.name}.amazonaws.com"
+  flow_log_group_arn = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.flow_log}"
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
 resource "aws_kms_key" "custom_kms_key" {
@@ -13,7 +14,7 @@ resource "aws_kms_key" "custom_kms_key" {
   enable_key_rotation     = true
   #checkov:skip=CKV2_AWS_64: "Ensure KMS key Policy is defined"
   #KMS Key policy is defined as aws_kms_key_policy encrypt_log {}
-  tags = merge({ Name = "${local.vpc_name}-encryption-key" }, var.tags)
+  tags = merge(var.tags, { Name = "${local.vpc_name}-encryption-key" })
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
 resource "aws_kms_alias" "key" {
@@ -51,22 +52,9 @@ resource "aws_kms_key_policy" "encrypt_log" {
           "kms:DescribeKey"
         ]
         Resource = "*"
-      },
-      {
-        Sid    = "AllowCloudWatchLogsEncryptionContext"
-        Effect = "Allow"
-        Principal = {
-          Service = local.principal_logs_arn
-        }
-        Action = [
-          "kms:CreateGrant",
-          "kms:ListGrants",
-          "kms:RevokeGrant"
-        ]
-        Resource = "*"
         Condition = {
-          Bool = {
-            "kms:GrantIsForAWSResource" : "true"
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" : "${local.flow_log_group_arn}*"
           }
         }
       }
