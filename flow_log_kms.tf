@@ -52,22 +52,9 @@ resource "aws_kms_key_policy" "encrypt_log" {
           "kms:DescribeKey"
         ]
         Resource = "*"
-      },
-      {
-        Sid    = "AllowCloudWatchLogsEncryptionContext"
-        Effect = "Allow"
-        Principal = {
-          Service = local.principal_logs_arn
-        }
-        Action = [
-          "kms:CreateGrant",
-          "kms:ListGrants",
-          "kms:RevokeGrant"
-        ]
-        Resource = "*"
         Condition = {
-          Bool = {
-            "kms:GrantIsForAWSResource" : "true"
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" : "${local.flow_log_group_arn}*"
           }
         }
       }
