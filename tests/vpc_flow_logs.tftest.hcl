@@ -42,7 +42,7 @@ run "flow_log_iam_validation" {
   command = apply
 
   assert {
-    condition     = var.enable_flow_log ? jsondecode(aws_iam_role.vpc_flow_log_role[0].assume_role_policy).Statement[0].Principal.Service == "vpc-flow-logs.amazonaws.com" : true
+    condition     = var.enable_flow_log ? jsondecode(aws_iam_role.vpc_flow_log_role[0].assume_role_policy).Statement[0].Principal.Service == "logs.amazonaws.com" : true
     error_message = "Flow log IAM role should be assumable by vpc-flow-logs service"
   }
 
