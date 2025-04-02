@@ -66,7 +66,7 @@ jobs:
 
 - job: Test
   variables:
-    terraformVersion: '1.12.0-beta1'  # Specify the Terraform version
+    terraformVersion: '1.11.3'  # Specify the Terraform version
     workingDirectory: 'example'  # Set working directory to 'example'
 
   displayName: 'Test Terraform Configuration'
@@ -86,7 +86,7 @@ jobs:
     # Terraform Test
     - script: |
         terraform init
-        terraform test -parallelism=4 -junit-xml test_result.xml
+        terraform test -junit-xml test_result.xml
       env:
         AWS_ACCESS_KEY_ID: $(test_access_key)
         AWS_SECRET_ACCESS_KEY: $(test_secret_key)
