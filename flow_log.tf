@@ -5,7 +5,7 @@ resource "aws_flow_log" "network_flow_logging" {
   log_destination = aws_cloudwatch_log_group.network_flow_logging[0].arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.this.id
-  tags            = merge(var.tags, {"Name" = "${local.flow_log}"})
+  tags            = merge(var.tags, { "Name" = "${local.flow_log}" })
 }
 
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group
@@ -14,7 +14,7 @@ resource "aws_cloudwatch_log_group" "network_flow_logging" {
   name              = local.flow_log
   retention_in_days = 365
   kms_key_id        = aws_kms_key.custom_kms_key[0].arn
-  tags              = merge(var.tags, {"Name" = "${local.flow_log}"})
+  tags              = merge(var.tags, { "Name" = "${local.flow_log}" })
 }
 
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document
@@ -34,7 +34,7 @@ resource "aws_iam_role" "vpc_flow_log_role" {
   count              = var.enable_flow_log ? 1 : 0
   name               = "${local.vpc_name}-vpc-flow-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
-  tags               = merge(var.tags, {"Name" = "${local.vpc_name}-vpc-flow-role"})
+  tags               = merge(var.tags, { "Name" = "${local.vpc_name}-vpc-flow-role" })
 }
 
 data "aws_iam_policy_document" "vpc_flow_log_policy_document" {
