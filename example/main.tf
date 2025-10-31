@@ -1,6 +1,6 @@
 module "vpc" {
   source                  = "kunduso/vpc/aws"
-  version                 = "1.0.3"
+  version                 = "1.0.5"
   region                  = var.region
   enable_internet_gateway = true
   enable_nat_gateway      = true
