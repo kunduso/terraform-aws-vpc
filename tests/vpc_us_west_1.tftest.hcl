@@ -5,7 +5,7 @@ provider "aws" {
 # Test the original failing case - 3 subnets in us-west-1 (2 AZs)
 run "test_us_west_1_fix" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.20.30.0/24"
     region              = "us-west-1"
@@ -37,7 +37,7 @@ run "test_us_west_1_fix" {
 # Test with 4 subnets in us-west-1 - should cycle AZ1, AZ2, AZ1, AZ2
 run "test_us_west_1_4_subnets" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.5.0.0/16"
     region              = "us-west-1"

@@ -5,7 +5,7 @@ provider "aws" {
 # Test with 2 subnets - should distribute across 2 AZs
 run "test_2_subnets" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.0.0.0/16"
     region              = "us-east-1"
@@ -32,7 +32,7 @@ run "test_2_subnets" {
 # Test with 3 subnets - should distribute across 3 AZs
 run "test_3_subnets" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.1.0.0/16"
     region              = "us-east-1"
@@ -54,7 +54,7 @@ run "test_3_subnets" {
 # Test with 4 subnets - should cycle through 3 AZs (AZ1, AZ2, AZ3, AZ1)
 run "test_4_subnets" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.2.0.0/16"
     region              = "us-east-1"
@@ -76,7 +76,7 @@ run "test_4_subnets" {
 # Test with 5 subnets - should cycle through 3 AZs (AZ1, AZ2, AZ3, AZ1, AZ2)
 run "test_5_subnets" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.3.0.0/16"
     region              = "us-east-1"
@@ -98,7 +98,7 @@ run "test_5_subnets" {
 # Test with 6 subnets - should cycle through 3 AZs (AZ1, AZ2, AZ3, AZ1, AZ2, AZ3)
 run "test_6_subnets" {
   command = plan
-  
+
   variables {
     vpc_cidr            = "10.4.0.0/16"
     region              = "us-east-1"
