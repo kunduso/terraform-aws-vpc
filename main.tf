@@ -21,7 +21,7 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = var.subnet_cidr_private[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index % min(3, length(data.aws_availability_zones.available.names))]
-  tags              = merge({ "Name" = "${local.vpc_name}-private-${count.index + 1}" }, var.tags)
+  tags              = merge({ "Name" = "${local.vpc_name}-private-${count.index + 1}" }, var.tags, var.private_subnet_tags)
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet
 resource "aws_subnet" "public" {
@@ -30,7 +30,7 @@ resource "aws_subnet" "public" {
   cidr_block              = var.subnet_cidr_public[count.index]
   availability_zone       = data.aws_availability_zones.available.names[count.index % min(3, length(data.aws_availability_zones.available.names))]
   map_public_ip_on_launch = true
-  tags                    = merge({ "Name" = "${local.vpc_name}-public-${count.index + 1}" }, var.tags)
+  tags                    = merge({ "Name" = "${local.vpc_name}-public-${count.index + 1}" }, var.tags, var.public_subnet_tags)
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table
 resource "aws_route_table" "private" {

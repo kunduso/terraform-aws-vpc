@@ -102,3 +102,15 @@ variable "enable_flow_log" {
   type        = bool
   default     = true
 }
+
+variable "public_subnet_tags" {
+  description = "Additional tags for public subnets"
+  type        = map(string)
+  default     = {}
+}
+
+variable "private_subnet_tags" {
+  description = "Additional tags for private subnets"
+  type        = map(string)
+  default     = {}
+}
