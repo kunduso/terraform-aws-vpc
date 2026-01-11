@@ -4,7 +4,7 @@ provider "aws" {
 
 # Test subnet-specific tags functionality
 run "test_subnet_specific_tags" {
-  command = plan
+  command = apply
 
   variables {
     vpc_cidr            = "10.0.0.0/16"
