@@ -64,6 +64,8 @@ This module provides foundation for setting up secure, isolated environments in 
 | <a name="input_enable_flow_log"></a> [enable_flow_log](#input_enable_flow_log) | Enable VPC flow logs | `bool` | `true` | no |
 | <a name="input_enable_internet_gateway"></a> [enable_internet_gateway](#input_enable_internet_gateway) | Enable internet gateway for VPC. | `bool` | `false` | no |
 | <a name="input_enable_nat_gateway"></a> [enable_nat_gateway](#input_enable_nat_gateway) | Enable nat gateway for VPC. | `bool` | `false` | no |
+| <a name="input_private_subnet_tags"></a> [private_subnet_tags](#input_private_subnet_tags) | Additional tags for private subnets | `map(string)` | `{}` | no |
+| <a name="input_public_subnet_tags"></a> [public_subnet_tags](#input_public_subnet_tags) | Additional tags for public subnets | `map(string)` | `{}` | no |
 | <a name="input_subnet_cidr_private"></a> [subnet_cidr_private](#input_subnet_cidr_private) | CIDR blocks for the private subnets. | `list(any)` | `[]` | no |
 | <a name="input_subnet_cidr_public"></a> [subnet_cidr_public](#input_subnet_cidr_public) | CIDR blocks for the public subnets. | `list(any)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input_tags) | AWS Cloud resource tags. | `map(string)` | <pre>{<br/>  "Module": "https://github.com/kunduso/terraform-aws-vpc"<br/>}</pre> | no |
